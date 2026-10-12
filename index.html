@@ -1,0 +1,1657 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="MediTrack 360 - Smart Digital Patient History Management System. Student science exhibition prototype with fictional data.">
+<meta name="robots" content="noindex">
+<title>MediTrack 360</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: fixed navy console sidebar + light clinical workspace; cards only where a record section stands alone */
+:root{
+  --bg:#F1F5F9; --surface:#FFFFFF; --surface-2:#F6F9FC; --line:#DCE4EE; --line-strong:#C2CFDE;
+  --fg:#0C1E36; --muted:#55667E;
+  --brand:#0B2545; --brand-2:#14365F; --brand-fg:#D6E3F3; --brand-muted:#88A1C2; --brand-strong:#FFFFFF;
+  --accent:#0B8A83; --accent-strong:#06706A; --accent-soft:#DCF2EF; --btn:#0A6E68; --btn-fg:#FFFFFF;
+  --band:rgba(11,138,131,.13);
+  --danger:#B42318; --danger-soft:#FEF0EE; --danger-line:#F3C0B9; --on-danger:#FFFFFF;
+  --warn:#8F5400; --warn-soft:#FFF4DC; --warn-line:#EFD39A;
+  --ok:#17784A; --ok-soft:#E3F4EA;
+  --shadow:0 1px 2px rgba(12,30,54,.05),0 6px 20px rgba(12,30,54,.06);
+  --font-ui:"Albert Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --font-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#08121F; --surface:#0E1B2E; --surface-2:#12233A; --line:#1E3250; --line-strong:#2C4567;
+    --fg:#E3ECF6; --muted:#93A6C0;
+    --brand:#061020; --brand-2:#10264A; --brand-fg:#D6E3F3; --brand-muted:#7D95B6; --brand-strong:#FFFFFF;
+    --accent:#2CC0B4; --accent-strong:#62D8CE; --accent-soft:#0D383A; --btn:#2CC0B4; --btn-fg:#04201F;
+    --band:rgba(44,192,180,.15);
+    --danger:#FF8B7F; --danger-soft:#361417; --danger-line:#6A2A2B; --on-danger:#2A0A0B;
+    --warn:#F2B552; --warn-soft:#30230C; --warn-line:#5C4519;
+    --ok:#5ACF92; --ok-soft:#0F2E1F;
+    --shadow:0 1px 2px rgba(0,0,0,.35);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#08121F; --surface:#0E1B2E; --surface-2:#12233A; --line:#1E3250; --line-strong:#2C4567;
+  --fg:#E3ECF6; --muted:#93A6C0;
+  --brand:#061020; --brand-2:#10264A; --brand-fg:#D6E3F3; --brand-muted:#7D95B6; --brand-strong:#FFFFFF;
+  --accent:#2CC0B4; --accent-strong:#62D8CE; --accent-soft:#0D383A; --btn:#2CC0B4; --btn-fg:#04201F;
+  --band:rgba(44,192,180,.15);
+  --danger:#FF8B7F; --danger-soft:#361417; --danger-line:#6A2A2B; --on-danger:#2A0A0B;
+  --warn:#F2B552; --warn-soft:#30230C; --warn-line:#5C4519;
+  --ok:#5ACF92; --ok-soft:#0F2E1F;
+  --shadow:0 1px 2px rgba(0,0,0,.35);
+  color-scheme:dark;
+}
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{background:var(--bg);color:var(--fg);font:15px/1.55 var(--font-ui);-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{margin:0;font-weight:650;letter-spacing:-.012em;text-wrap:balance;line-height:1.25}
+p,ul,ol,dl,dd{margin:0}
+ul,ol{padding:0;list-style:none}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+.ic{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.sr{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0;padding:0;margin:-1px}
+.eyebrow{font-size:11.5px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+
+/* ---------- buttons, inputs, chips ---------- */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border-radius:8px;border:1px solid var(--line-strong);background:var(--surface);font-weight:600;font-size:14px;line-height:1.2;transition:background .15s,border-color .15s;white-space:nowrap}
+.btn:hover{background:var(--surface-2);border-color:var(--accent)}
+.btn.primary{background:var(--btn);color:var(--btn-fg);border-color:var(--btn)}
+.btn.primary:hover{background:var(--accent-strong);border-color:var(--accent-strong)}
+.btn[disabled]{opacity:.6;cursor:progress}
+.btn .ic{width:16px;height:16px}
+.link{background:none;border:0;padding:0;color:var(--accent-strong);font-weight:600;font-size:13.5px;display:inline-flex;align-items:center;gap:6px}
+.link:hover{text-decoration:underline}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label,.lbl{font-size:13px;font-weight:600;color:var(--muted)}
+.input,select.input{width:100%;padding:11px 13px;border-radius:8px;border:1px solid var(--line-strong);background:var(--surface);font-size:15px;min-width:0}
+.input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--band)}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border-radius:999px;border:1px solid var(--line-strong);background:var(--surface);font-size:13px;font-weight:600}
+.chip:hover{border-color:var(--accent)}
+.chip[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-strong)}
+.chip.mono{font-family:var(--font-mono);font-weight:500}
+
+/* ---------- messages / loading ---------- */
+.msg{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:8px;font-size:14px;border:1px solid}
+.msg .ic{margin-top:2px}
+.msg.error{background:var(--danger-soft);border-color:var(--danger-line);color:var(--fg)}
+.msg.error .ic{color:var(--danger)}
+.msg.info{background:var(--accent-soft);border-color:transparent}
+.msg .msg-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.loading{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:14px;font-weight:500}
+.spinner{width:18px;height:18px;border-radius:50%;border:2.5px solid var(--line-strong);border-top-color:var(--accent);animation:spin .8s linear infinite;flex:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.skel{display:grid;gap:10px;margin-top:14px}
+.skel i{display:block;height:14px;border-radius:6px;background:linear-gradient(90deg,var(--surface-2),var(--line),var(--surface-2));background-size:200% 100%;animation:shimmer 1.2s infinite}
+.skel i:nth-child(1){width:55%;height:20px}.skel i:nth-child(2){width:80%}.skel i:nth-child(3){width:68%}
+@keyframes shimmer{to{background-position:-200% 0}}
+
+/* ---------- login ---------- */
+.login{min-height:100%;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr)}
+.login-brand{background:var(--brand);color:var(--brand-fg);padding:48px clamp(24px,5vw,72px);display:flex;flex-direction:column;justify-content:center;gap:28px;position:relative;overflow:hidden}
+.login-brand h1{font-size:clamp(30px,4vw,44px);color:var(--brand-strong);letter-spacing:-.025em;font-weight:700}
+.login-brand h1 span{color:var(--accent)}
+.login-brand .lead{font-size:17px;max-width:46ch;color:var(--brand-fg)}
+.ecg{width:100%;height:70px;display:block}
+.ecg path{fill:none;stroke:var(--accent);stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round;stroke-dasharray:900;stroke-dashoffset:0;animation:trace 2.4s ease-out}
+@keyframes trace{from{stroke-dashoffset:900}}
+.login-feats{display:grid;gap:12px;max-width:440px}
+.login-feats li{display:flex;gap:12px;align-items:flex-start;font-size:14.5px}
+.login-feats .ic{color:var(--accent);margin-top:2px}
+.login-note{font-size:12.5px;color:var(--brand-muted);max-width:52ch;border-top:1px solid var(--brand-2);padding-top:16px}
+.login-panel{display:flex;align-items:center;justify-content:center;padding:40px 20px;background:var(--bg)}
+.login-card{width:100%;max-width:410px;display:flex;flex-direction:column;gap:20px}
+.login-card h2{font-size:24px}
+.login-card form{display:flex;flex-direction:column;gap:16px}
+.demo-creds{border:1px dashed var(--line-strong);border-radius:var(--r);padding:14px;display:grid;gap:10px;background:var(--surface)}
+.cred{display:flex;align-items:center;gap:12px;justify-content:space-between;flex-wrap:wrap}
+.cred-role{font-weight:600;font-size:14px}
+.cred-sub{font-size:12.5px;color:var(--muted)}
+@media (max-width:860px){.login{grid-template-columns:1fr}.login-brand{padding:32px 20px;gap:20px}.login-feats{display:none}}
+
+/* ---------- app shell ---------- */
+.app{display:grid;grid-template-columns:252px minmax(0,1fr);min-height:100%}
+.sidebar{background:var(--brand);color:var(--brand-fg);display:flex;flex-direction:column;gap:22px;position:sticky;top:0;height:100vh;height:100dvh;padding:20px 14px;overflow-y:auto}
+.brand{display:flex;gap:11px;align-items:center;padding:2px 8px}
+.brand-mark{width:38px;height:38px;border-radius:10px;background:var(--accent);color:var(--brand);display:grid;place-items:center;flex:none}
+.brand-mark .ic{width:22px;height:22px;stroke-width:2}
+.brand-name{font-weight:700;font-size:17px;color:var(--brand-strong);line-height:1.15}
+.brand-sub{font-size:11.5px;color:var(--brand-muted)}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav-label{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--brand-muted);padding:6px 12px}
+.nav-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:8px;border:0;background:none;color:var(--brand-fg);text-align:left;width:100%;font-weight:500;font-size:14.5px}
+.nav-item:hover{background:var(--brand-2)}
+.nav-item[aria-current="page"]{background:var(--brand-2);color:var(--brand-strong);font-weight:600}
+.nav-item[aria-current="page"] .ic{color:var(--accent)}
+.nav-item .lk{margin-left:auto;width:14px;height:14px;opacity:.65}
+.side-foot{margin-top:auto;display:grid;gap:10px}
+.user-card{display:flex;gap:10px;align-items:center;padding:10px;border-radius:10px;background:var(--brand-2)}
+.u-av{width:36px;height:36px;border-radius:50%;background:var(--accent);color:var(--brand);display:grid;place-items:center;font-weight:700;font-size:13px;flex:none}
+.u-name{font-weight:600;color:var(--brand-strong);font-size:14px;line-height:1.2}
+.u-role{font-size:12px;color:var(--brand-muted)}
+.signout{display:flex;align-items:center;justify-content:center;gap:8px;padding:9px;border-radius:8px;border:1px solid var(--brand-2);background:none;color:var(--brand-fg);font-weight:600;font-size:13.5px}
+.signout:hover{background:var(--brand-2)}
+.idle-note{font-size:11.5px;color:var(--brand-muted);text-align:center}
+
+.main{min-width:0;display:flex;flex-direction:column}
+.topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--surface);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding-block:12px;padding-inline:clamp(16px,3vw,32px)}
+.menu-btn{display:none;border:1px solid var(--line-strong);background:var(--surface);border-radius:8px;padding:8px}
+.page-title{min-width:0;flex:1}
+.page-title h1{font-size:21px}
+.top-search{display:flex;gap:8px;align-items:center;flex:0 1 340px;min-width:0}
+.top-search .input{padding:9px 12px;font-family:var(--font-mono);font-size:14px}
+.demo-banner{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:var(--warn-soft);border-bottom:1px solid var(--warn-line);color:var(--fg);font-size:13px;padding-block:8px;padding-inline:clamp(16px,3vw,32px)}
+.demo-banner strong{color:var(--warn)}
+.demo-banner .ic{color:var(--warn);width:16px;height:16px}
+.content{padding-block:24px 56px;padding-inline:clamp(16px,3vw,32px);width:100%;max-width:1320px}
+.view{display:flex;flex-direction:column;gap:20px;animation:rise .3s ease-out}
+@keyframes rise{from{transform:translateY(6px)}}
+.scrim{display:none}
+@media (max-width:960px){
+  .app{grid-template-columns:1fr}
+  .sidebar{position:fixed;inset:0 auto 0 0;width:min(284px,86vw);z-index:60;transform:translateX(-104%);transition:transform .25s ease;padding-top:calc(20px + env(safe-area-inset-top,0px));padding-bottom:calc(20px + env(safe-area-inset-bottom,0px))}
+  .app.nav-open .sidebar{transform:none}
+  .app.nav-open .scrim{display:block;position:fixed;inset:0;background:rgba(6,16,32,.5);z-index:55}
+  .menu-btn{display:inline-flex}
+  .top-search{flex:1 1 100%;order:3}
+}
+
+/* ---------- panels ---------- */
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px;min-width:0}
+.panel-h{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.panel-h h2,.panel-h h3{font-size:16.5px;display:flex;align-items:center;gap:9px}
+.panel-h h2 .ic,.panel-h h3 .ic{color:var(--accent)}
+.panel-h .sub{font-size:13px;color:var(--muted)}
+.count{font-family:var(--font-mono);font-size:12px;padding:2px 8px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line);color:var(--muted)}
+.note{font-size:12.5px;color:var(--muted);margin-top:12px}
+.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+@media (max-width:900px){.grid-2{grid-template-columns:1fr}}
+.empty{text-align:center;padding:40px 20px;color:var(--muted);display:grid;justify-items:center;gap:10px}
+.empty .ic{width:34px;height:34px;color:var(--accent)}
+.empty strong{color:var(--fg);font-size:16px}
+
+/* ---------- dashboard ---------- */
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+@media (max-width:1100px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px;display:grid;gap:6px;min-width:0}
+.stat-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.stat-ico{width:36px;height:36px;border-radius:9px;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent-strong)}
+.stat.danger .stat-ico{background:var(--danger-soft);color:var(--danger)}
+.stat-val{font-family:var(--font-mono);font-size:34px;font-weight:600;letter-spacing:-.03em;line-height:1.1}
+.stat-lbl{font-weight:600;font-size:14px}
+.stat-sub{font-size:12.5px;color:var(--muted)}
+.dash-grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:20px;align-items:start}
+.dash-col{display:flex;flex-direction:column;gap:20px;min-width:0}
+@media (max-width:1100px){.dash-grid{grid-template-columns:1fr}}
+.row-list{display:flex;flex-direction:column}
+.row-btn{display:grid;grid-template-columns:92px minmax(0,1fr) auto;gap:14px;align-items:center;padding:11px 8px;border:0;border-top:1px solid var(--line);background:none;text-align:left;width:100%;border-radius:0}
+.row-list>li:first-child .row-btn{border-top:0}
+.row-btn:hover{background:var(--surface-2)}
+.row-date{font-family:var(--font-mono);font-size:12.5px;color:var(--muted)}
+.row-main{min-width:0}
+.row-main strong{display:block;font-weight:600;font-size:14.5px}
+.row-main span{font-size:13px;color:var(--muted)}
+@media (max-width:520px){.row-btn{grid-template-columns:minmax(0,1fr) auto}.row-date{grid-column:1/-1}}
+.badge{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:3px 8px;border-radius:6px;white-space:nowrap}
+.k-opd{background:var(--accent-soft);color:var(--accent-strong)}
+.k-emergency{background:var(--danger-soft);color:var(--danger)}
+.k-inpatient{background:var(--warn-soft);color:var(--warn)}
+.sev{font-size:11.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:3px 8px;border-radius:6px;white-space:nowrap}
+.sev-severe{background:var(--danger);color:var(--on-danger)}
+.sev-moderate{background:var(--warn-soft);color:var(--warn);border:1px solid var(--warn-line)}
+.sev-mild{background:var(--surface-2);color:var(--muted);border:1px solid var(--line)}
+.chart-box{position:relative;height:270px;width:100%}
+.quick form{display:flex;gap:8px}
+.quick .input{font-family:var(--font-mono)}
+.quick .demo-ids{margin-top:10px}
+.demo-ids{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:13px;color:var(--muted)}
+.log li{display:grid;grid-template-columns:52px minmax(0,1fr);gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:13px}
+.log li:first-child{border-top:0}
+.log time{font-family:var(--font-mono);color:var(--muted);font-size:12px}
+.log .who{color:var(--muted)}
+
+/* ---------- search ---------- */
+.search-hero{padding:28px}
+.search-hero h2{font-size:22px}
+.search-hero>p{color:var(--muted);margin-top:6px;max-width:60ch}
+.big-search{display:flex;gap:10px;margin-top:18px;max-width:620px}
+.big-search .input{font-family:var(--font-mono);font-size:18px;padding:13px 16px;letter-spacing:.02em}
+.big-search .btn{padding:0 22px;font-size:15px}
+.search-hero .demo-ids{margin-top:12px}
+#searchResult{margin-top:18px;max-width:620px}
+#searchResult:empty{display:none}
+@media (max-width:520px){.big-search{flex-direction:column}.big-search .btn{padding:12px}}
+.qr-scan p{color:var(--muted);max-width:62ch}
+.qr-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:14px}
+.qr-row form{display:flex;gap:8px;flex:1 1 280px;min-width:0}
+.qr-row .input{font-family:var(--font-mono);font-size:14px}
+.file-btn{position:relative}
+.file-btn:has(input:focus-visible){outline:2px solid var(--accent);outline-offset:2px}
+#qrMsg{margin-top:12px}
+#qrMsg:empty{display:none}
+.steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;counter-reset:s}
+.steps li{counter-increment:s;padding:14px;border-radius:8px;background:var(--surface-2);border:1px solid var(--line);font-size:13.5px}
+.steps li::before{content:counter(s);display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--accent-soft);color:var(--accent-strong);font:600 12px var(--font-mono);margin-bottom:8px}
+.steps strong{display:block;font-size:14px;margin-bottom:2px}
+@media (max-width:900px){.steps{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:440px){.steps{grid-template-columns:1fr}}
+
+/* ---------- patient directory + profile ---------- */
+.directory{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+@media (max-width:760px){.directory{grid-template-columns:1fr}}
+.dir-card{display:flex;gap:12px;align-items:center;padding:12px 14px;border-radius:var(--r);border:1px solid var(--line);background:var(--surface);text-align:left;width:100%;min-width:0}
+.dir-card:hover{border-color:var(--accent)}
+.dir-card[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.dir-card .av{width:40px;height:40px;font-size:14px}
+.dir-txt{min-width:0;flex:1}
+.dir-txt strong{display:block;font-size:14.5px}
+.dir-txt span{font-size:12.5px;color:var(--muted)}
+.dir-al{font-size:11px;font-weight:700;color:var(--danger);display:flex;align-items:center;gap:4px;white-space:nowrap}
+.dir-al .ic{width:14px;height:14px}
+.av{border-radius:50%;background:var(--brand);color:var(--brand-strong);display:grid;place-items:center;font-weight:700;flex:none;letter-spacing:.02em}
+.profile{display:flex;flex-direction:column;gap:20px}
+.profile-head{display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap}
+.profile-head .av{width:64px;height:64px;font-size:22px;background:var(--brand);box-shadow:0 0 0 4px var(--accent-soft)}
+.ph-main{flex:1 1 380px;min-width:0;display:grid;gap:6px}
+.ph-main h2{font-size:26px;letter-spacing:-.02em}
+.facts{display:flex;flex-wrap:wrap;gap:10px 28px;margin-top:8px}
+.facts dt{font-size:11.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.facts dd{font-weight:600;font-size:15px}
+.blood{display:inline-flex;align-items:center;gap:5px;color:var(--danger);font-family:var(--font-mono)}
+.blood .ic{width:15px;height:15px;fill:currentColor;stroke:none}
+.ph-actions{display:flex;gap:8px;flex-wrap:wrap}
+
+.allergy-alert{display:flex;border-radius:var(--r);border:1.5px solid var(--danger);background:var(--danger-soft);overflow:hidden}
+.aa-icon{background:var(--danger);color:var(--on-danger);display:grid;place-items:center;padding:0 18px;flex:none}
+.aa-icon .ic{width:28px;height:28px;stroke-width:2.2}
+.aa-body{padding:14px 18px;flex:1;min-width:0}
+.aa-title{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;font-weight:700;color:var(--danger);text-transform:uppercase;letter-spacing:.08em;font-size:13.5px}
+.aa-title span{text-transform:none;letter-spacing:0;font-weight:600;color:var(--fg);font-size:13.5px}
+.aa-list{display:grid;gap:6px;margin-top:10px}
+.aa-list li{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;padding:8px 10px;border-radius:7px;background:var(--surface);border:1px solid var(--danger-line)}
+.aa-list strong{font-size:15.5px}
+.aa-react{font-size:13.5px;color:var(--muted)}
+.aa-date{font-size:12px;color:var(--muted);margin-left:auto;font-family:var(--font-mono)}
+.aa-foot{font-size:12.5px;color:var(--muted);margin-top:10px}
+.allergy-alert.flash{animation:alertpulse 1s ease-out 2}
+@keyframes alertpulse{0%{box-shadow:0 0 0 0 var(--danger-line)}60%{box-shadow:0 0 0 10px transparent}100%{box-shadow:0 0 0 0 transparent}}
+.allergy-strip{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 14px;border-radius:8px;background:var(--danger-soft);border:1px solid var(--danger-line);font-size:13.5px}
+.allergy-strip>strong{color:var(--danger);display:flex;align-items:center;gap:6px;text-transform:uppercase;letter-spacing:.06em;font-size:12.5px}
+.no-allergy{padding:12px 16px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--muted);font-size:14px}
+
+.cond-list li,.surg-list li{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid var(--line);flex-wrap:wrap}
+.cond-list li:first-child,.surg-list li:first-child{border-top:0;padding-top:0}
+.cond-list strong,.surg-list strong{font-weight:600}
+.cond-list small,.surg-list small{display:block;color:var(--muted);font-size:12.5px}
+.status{font-size:12px;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line);height:fit-content;white-space:nowrap}
+
+.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:8px}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-size:11.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);background:var(--surface-2)}
+tbody tr:last-child td{border-bottom:0}
+td.num,th.num{text-align:right;font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+td.out{color:var(--danger);font-weight:600}
+.flag{display:inline-block;margin-left:5px;font-size:10.5px;font-weight:700;padding:1px 5px;border-radius:4px;background:var(--danger-soft);color:var(--danger);border:1px solid var(--danger-line);vertical-align:1px}
+.ref{color:var(--muted);font-family:var(--font-mono);font-size:13px}
+
+.restricted{display:flex;gap:16px;align-items:flex-start;padding:22px;border-radius:var(--r);border:1px dashed var(--line-strong);background:var(--surface)}
+.restricted .ic{width:28px;height:28px;color:var(--muted)}
+.restricted strong{display:block;font-size:16px;margin-bottom:4px}
+.restricted p{color:var(--muted);max-width:64ch;font-size:14px}
+
+/* ---------- context header (history / labs) ---------- */
+.toolbar{display:flex;gap:14px;align-items:flex-end;flex-wrap:wrap}
+.toolbar .field{flex:0 1 300px;min-width:0}
+.filters{display:flex;flex-wrap:wrap;gap:6px}
+.ctx{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.ctx .av{width:44px;height:44px;font-size:15px}
+.ctx-txt{min-width:0;flex:1}
+.ctx-txt strong{font-size:17px;display:block}
+.ctx-txt span{font-size:13px;color:var(--muted)}
+
+/* ---------- timeline ---------- */
+.tl-year{font-family:var(--font-mono);font-weight:600;font-size:13px;color:var(--muted);padding:6px 0 10px 50px}
+.tl{position:relative;display:grid;gap:12px;margin-bottom:22px}
+.tl::before{content:"";position:absolute;left:17px;top:6px;bottom:6px;width:2px;background:var(--line)}
+.tl-item{display:grid;grid-template-columns:36px minmax(0,1fr);gap:14px;position:relative}
+.tl-dot{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:var(--surface);border:2px solid var(--line-strong);z-index:1;color:var(--muted)}
+.tl-dot .ic{width:16px;height:16px}
+.t-visit .tl-dot{border-color:var(--accent);color:var(--accent-strong)}
+.t-emergency .tl-dot,.t-allergy .tl-dot{border-color:var(--danger);color:var(--danger)}
+.t-lab .tl-dot{border-color:var(--brand-2);color:var(--fg)}
+.t-procedure .tl-dot,.t-inpatient .tl-dot{border-color:var(--warn);color:var(--warn)}
+.tl-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 16px;min-width:0}
+.tl-top{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:4px}
+.tl-date{font-family:var(--font-mono);font-size:12.5px;color:var(--muted)}
+.tl-type{font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.tl-card h4{font-size:15.5px}
+.tl-card p{font-size:14px;margin-top:2px}
+.tl-meta{font-size:12.5px;color:var(--muted);margin-top:4px}
+.tl-vals{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.tl-vals span{font-family:var(--font-mono);font-size:12px;padding:3px 8px;border-radius:6px;background:var(--surface-2);border:1px solid var(--line)}
+.tl-vals span.out{color:var(--danger);border-color:var(--danger-line);background:var(--danger-soft)}
+
+/* ---------- labs ---------- */
+.fiction-flag{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:12px 16px;border-radius:8px;border:1.5px dashed var(--warn);background:var(--warn-soft);font-size:14px}
+.fiction-flag strong{color:var(--warn);text-transform:uppercase;letter-spacing:.06em;font-size:12.5px}
+.fiction-flag .ic{color:var(--warn)}
+.trend-head{display:flex;gap:28px;flex-wrap:wrap;align-items:flex-end;margin:16px 0 8px}
+.th-big{font-family:var(--font-mono);font-size:30px;font-weight:600;letter-spacing:-.03em;line-height:1}
+.th-big small{font-size:14px;color:var(--muted);font-weight:500;margin-left:4px;letter-spacing:0}
+.th-big.out{color:var(--danger)}
+.th-lbl{font-size:12px;color:var(--muted);margin-bottom:4px}
+.legend{display:flex;flex-wrap:wrap;gap:16px;font-size:12.5px;color:var(--muted);margin-top:10px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.lg-band{width:18px;height:10px;background:var(--band);border:1px solid var(--accent);border-radius:2px}
+.lg-pt{width:10px;height:10px;border-radius:50%;background:var(--accent)}
+.lg-pt.out{background:var(--danger)}
+.cmp-controls{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:14px}
+.cmp-controls .field{flex:1 1 200px;min-width:0}
+.delta{font-family:var(--font-mono)}
+.delta.up::before{content:"▲ ";font-size:10px}
+.delta.down::before{content:"▼ ";font-size:10px}
+.delta.same{color:var(--muted)}
+
+/* ---------- about ---------- */
+.about-hero{background:var(--brand);color:var(--brand-fg);border-radius:var(--r);padding:clamp(22px,4vw,40px);display:grid;gap:12px}
+.about-hero h2{color:var(--brand-strong);font-size:clamp(22px,3vw,30px);max-width:24ch}
+.about-hero p{max-width:66ch;font-size:15.5px}
+.about-hero .eyebrow{color:var(--accent)}
+.prose p{max-width:68ch;color:var(--fg)}
+.prose p+p{margin-top:10px}
+.ticks{display:grid;gap:9px}
+.ticks li{display:flex;gap:10px;align-items:flex-start;font-size:14.5px;max-width:70ch}
+.ticks .ic{color:var(--accent);margin-top:3px;width:16px;height:16px}
+.ticks.warn .ic{color:var(--warn)}
+.cmp-table td{white-space:normal;min-width:180px;vertical-align:top}
+.cmp-table td:first-child{font-weight:600;min-width:140px}
+
+/* ---------- registration ---------- */
+.reg-form{display:flex;flex-direction:column;gap:20px}
+.reg-form fieldset{border:0;border-top:1px solid var(--line);margin:0;padding:16px 0 0;min-width:0}
+.reg-form legend{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent-strong);padding:0 10px 0 0}
+.form-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:6px}
+.form-grid .span-2{grid-column:span 2}
+@media (max-width:760px){.form-grid{grid-template-columns:1fr}.form-grid .span-2{grid-column:auto}}
+.input.invalid{border-color:var(--danger);box-shadow:0 0 0 3px var(--danger-soft)}
+.al-rows{display:grid;gap:8px}
+.al-row{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1.4fr) minmax(0,.9fr) auto;gap:8px;align-items:center}
+@media (max-width:640px){.al-row{grid-template-columns:1fr 1fr}.al-row .input:nth-child(2){grid-column:1/-1;order:3}}
+.al-empty{font-size:13.5px;color:var(--muted)}
+.form-actions{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:16px}
+.reg-ok{display:flex;gap:18px;align-items:center;flex-wrap:wrap;border:1.5px solid var(--ok);background:var(--ok-soft);border-radius:var(--r);padding:18px 20px}
+.reg-ok .big-id{font-family:var(--font-mono);font-size:30px;font-weight:600;letter-spacing:-.02em;color:var(--fg)}
+.reg-ok .ok-txt{flex:1 1 240px;min-width:0}
+.reg-ok .ok-txt strong{color:var(--ok);text-transform:uppercase;letter-spacing:.07em;font-size:12.5px;display:flex;align-items:center;gap:6px}
+
+/* ---------- emergency summary ---------- */
+.em-head{display:flex;gap:16px;align-items:center;flex-wrap:wrap;background:var(--danger);color:var(--on-danger);border-radius:var(--r);padding:16px 20px}
+.em-head .ic{width:30px;height:30px}
+.em-head h2{font-size:21px}
+.em-head p{font-size:13.5px;opacity:.92}
+.em-head .em-id{margin-left:auto;font-family:var(--font-mono);font-weight:600;font-size:18px}
+.em-grid{display:grid;grid-template-columns:minmax(0,.7fr) minmax(0,1.3fr);gap:16px}
+@media (max-width:860px){.em-grid{grid-template-columns:1fr}}
+.em-tile{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;min-width:0}
+.em-tile h3{font-size:12px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.em-tile h3 .ic{width:16px;height:16px}
+.em-blood{font-family:var(--font-mono);font-size:64px;font-weight:600;line-height:1;color:var(--danger);letter-spacing:-.04em}
+.em-tile.al{border:1.5px solid var(--danger);background:var(--danger-soft)}
+.em-tile.al h3{color:var(--danger)}
+.em-list{display:grid;gap:8px}
+.em-list li{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;font-size:15px}
+.em-list li strong{font-size:16px}
+.em-contact{display:grid;gap:4px}
+.em-contact .nm{font-size:18px;font-weight:650}
+.em-contact .ph{font-family:var(--font-mono);font-size:20px;font-weight:600;user-select:all}
+.contact-dl{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.contact-dl dt{font-size:11.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.contact-dl dd{font-weight:600}
+@media (max-width:760px){.contact-dl{grid-template-columns:1fr}}
+.audit-table td{white-space:nowrap}
+.role-pill{font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line)}
+.act-deny{color:var(--danger);font-weight:600}
+
+/* ---------- dialogs, toast ---------- */
+dialog{border:1px solid var(--line);border-radius:14px;padding:0;background:var(--surface);color:var(--fg);width:min(560px,calc(100vw - 32px));box-shadow:0 20px 60px rgba(6,16,32,.35)}
+dialog::backdrop{background:rgba(6,16,32,.55)}
+.dlg-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 20px;border-bottom:1px solid var(--line)}
+.dlg-head h2{font-size:17px;display:flex;align-items:center;gap:8px}
+.dlg-head h2 .ic{color:var(--accent)}
+.icon-btn{border:0;background:none;padding:6px;border-radius:6px;display:grid;place-items:center;color:var(--muted)}
+.icon-btn:hover{background:var(--surface-2)}
+.dlg-body{padding:20px;display:grid;gap:14px}
+.dlg-foot{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;padding:14px 20px;border-top:1px solid var(--line);background:var(--surface-2);border-radius:0 0 14px 14px}
+.qr-body{display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start}
+.qr-frame{background:#FFFFFF;padding:14px;border-radius:10px;border:1px solid var(--line);flex:none}
+#qrCanvas{width:180px;height:180px}
+#qrCanvas img,#qrCanvas canvas{width:180px!important;height:180px!important;display:block}
+.qr-info{flex:1 1 220px;min-width:0;display:grid;gap:10px;font-size:14px}
+.qr-payload{font-family:var(--font-mono);font-size:15px;font-weight:600;padding:8px 10px;border-radius:6px;background:var(--surface-2);border:1px solid var(--line);user-select:all;word-break:break-all}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--brand);color:var(--brand-strong);padding:11px 18px;border-radius:9px;font-size:14px;font-weight:500;z-index:100;box-shadow:var(--shadow);max-width:calc(100vw - 32px)}
+
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<!-- icon sprite -->
+<svg style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
+  <symbol id="i-pulse" viewBox="0 0 24 24"><path d="M19 14c1.5-1.5 3-3.2 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.8 0-3 .5-4.5 2-1.5-1.5-2.7-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4 3 5.5l7 7Z"/><path d="M3.5 12h4.5l1.5-3 3 6 1.5-3h6"/></symbol>
+  <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+  <symbol id="i-clip" viewBox="0 0 24 24"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4M12 16h4M8 11h.01M8 16h.01"/></symbol>
+  <symbol id="i-history" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3.5 2"/></symbol>
+  <symbol id="i-flask" viewBox="0 0 24 24"><path d="M9 3h6M10 3v6.5L4.6 18.4A2 2 0 0 0 6.3 21.5h11.4a2 2 0 0 0 1.7-3.1L14 9.5V3"/><path d="M7.2 15h9.6"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4.5M12 8h.01"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4M12 17h.01"/></symbol>
+  <symbol id="i-qr" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM21 14v.01M14 21h.01M17 21h4v-4"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></symbol>
+  <symbol id="i-out" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5M21 12H9"/></symbol>
+  <symbol id="i-drop" viewBox="0 0 24 24"><path d="M12 2.7s-6.5 6.6-6.5 11.6a6.5 6.5 0 0 0 13 0C18.5 9.3 12 2.7 12 2.7Z"/></symbol>
+  <symbol id="i-pill" viewBox="0 0 24 24"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/><path d="m8.5 8.5 7 7"/></symbol>
+  <symbol id="i-cut" viewBox="0 0 24 24"><path d="M4 20 15 9"/><path d="m15 9 2.5-5.5L21 7l-6 2Z"/><path d="M8 16l2 2"/></symbol>
+  <symbol id="i-steth" viewBox="0 0 24 24"><path d="M6 3H5a1 1 0 0 0-1 1v5a5 5 0 0 0 10 0V4a1 1 0 0 0-1-1h-1"/><path d="M9 14v1a6 6 0 0 0 12 0v-3"/><circle cx="21" cy="10" r="2"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0"/><path d="M16 4.1a4 4 0 0 1 0 7.8M22 21a7 7 0 0 0-4-6.3"/></symbol>
+  <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></symbol>
+  <symbol id="i-upload" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-bed" viewBox="0 0 24 24"><path d="M2 4v16M2 8h18a2 2 0 0 1 2 2v10M2 17h20"/><path d="M6 8v9"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.9.6 2.8.7a2 2 0 0 1 1.7 2Z"/></symbol>
+  <symbol id="i-siren" viewBox="0 0 24 24"><path d="M7 18v-6a5 5 0 0 1 10 0v6"/><path d="M5 21a1 1 0 0 1-1-1v-1a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v1a1 1 0 0 1-1 1Z"/><path d="M21 12h1M18.5 4.5 18 5M2 12h1M12 2v1M4.9 4.9l.7.7"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol>
+</svg>
+
+<!-- ======================= LOGIN ======================= -->
+<div id="login" class="login">
+  <section class="login-brand">
+    <div class="brand" style="padding:0">
+      <div class="brand-mark"><svg class="ic"><use href="#i-pulse"/></svg></div>
+      <div><div class="brand-name">MediTrack 360</div><div class="brand-sub">Smart Digital Patient History</div></div>
+    </div>
+    <h1>One Patient ID.<br><span>The whole history.</span></h1>
+    <p class="lead">Authorized doctors retrieve organized patient history, allergy alerts and laboratory trends in seconds, instead of searching through paper files.</p>
+    <svg class="ecg" viewBox="0 0 600 80" preserveAspectRatio="none" aria-hidden="true"><path d="M0 44 H150 L165 44 L176 30 L186 52 L198 8 L212 74 L224 44 H300 L318 36 L334 44 H430 L445 44 L456 30 L466 52 L478 8 L492 74 L504 44 H600"/></svg>
+    <ul class="login-feats">
+      <li><svg class="ic"><use href="#i-alert"/></svg><span>Allergy alerts appear first, every time a record opens</span></li>
+      <li><svg class="ic"><use href="#i-flask"/></svg><span>Lab results charted against reference ranges, comparable across dates</span></li>
+      <li><svg class="ic"><use href="#i-qr"/></svg><span>QR codes carry only the Patient ID, never medical details</span></li>
+      <li><svg class="ic"><use href="#i-siren"/></svg><span>Emergency summary: blood group, allergies, medicines, emergency contact</span></li>
+      <li><svg class="ic"><use href="#i-shield"/></svg><span>Doctor-only clinical access, PIN confirmation and a full audit log</span></li>
+    </ul>
+    <p class="login-note">Student prototype for a State-Level Science Exhibition. All patients and results are fictional. Not a clinically validated system and not connected to any hospital database.</p>
+  </section>
+  <section class="login-panel">
+    <div class="login-card">
+      <div>
+        <div class="eyebrow">Staff sign-in</div>
+        <h2>Sign in to view patient records</h2>
+      </div>
+      <form id="loginForm" novalidate>
+        <div class="field"><label for="staffId">Staff ID</label><input class="input mono" id="staffId" autocomplete="username" placeholder="e.g. DR-2041" spellcheck="false"></div>
+        <div class="field"><label for="staffPin">PIN</label><input class="input mono" id="staffPin" type="password" inputmode="numeric" autocomplete="current-password" placeholder="4-digit PIN" maxlength="6"></div>
+        <div id="loginMsg" aria-live="polite"></div>
+        <button class="btn primary" id="loginBtn" type="submit" style="justify-content:center;padding:12px">Sign in</button>
+      </form>
+      <div class="demo-creds">
+        <div class="eyebrow">Demo accounts for the exhibition</div>
+        <div class="cred">
+          <div><div class="cred-role">Physician · full record</div><div class="cred-sub mono">DR-2041 · PIN 4321</div></div>
+          <button class="btn" type="button" data-cred="DR-2041|4321">Use</button>
+        </div>
+        <div class="cred">
+          <div><div class="cred-role">Front desk · identity + allergies only</div><div class="cred-sub mono">FD-1107 · PIN 2468</div></div>
+          <button class="btn" type="button" data-cred="FD-1107|2468">Use</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ======================= APP ======================= -->
+<div id="app" class="app" hidden>
+  <aside class="sidebar" id="sidebar" aria-label="Main navigation">
+    <div class="brand">
+      <div class="brand-mark"><svg class="ic"><use href="#i-pulse"/></svg></div>
+      <div><div class="brand-name">MediTrack 360</div><div class="brand-sub">Patient History System</div></div>
+    </div>
+    <nav class="nav">
+      <div class="nav-label">Workspace</div>
+      <button class="nav-item" data-view="dashboard"><svg class="ic"><use href="#i-grid"/></svg>Dashboard</button>
+      <button class="nav-item" data-view="search"><svg class="ic"><use href="#i-search"/></svg>Patient Search</button>
+      <button class="nav-item" data-view="register"><svg class="ic"><use href="#i-plus"/></svg>Patient Registration</button>
+      <button class="nav-item" data-view="records"><svg class="ic"><use href="#i-clip"/></svg>Patient Records</button>
+      <button class="nav-item" data-view="history"><svg class="ic"><use href="#i-history"/></svg>Medical History</button>
+      <button class="nav-item" data-view="emergency"><svg class="ic"><use href="#i-siren"/></svg>Emergency Summary</button>
+      <button class="nav-item" data-view="labs"><svg class="ic"><use href="#i-flask"/></svg>Laboratory Reports</button>
+      <button class="nav-item" data-view="audit"><svg class="ic"><use href="#i-shield"/></svg>Audit Log</button>
+      <div class="nav-label" style="margin-top:10px">Project</div>
+      <button class="nav-item" data-view="about"><svg class="ic"><use href="#i-info"/></svg>About the Project</button>
+    </nav>
+    <div class="side-foot">
+      <div class="user-card"><div class="u-av" id="uAv">DR</div><div style="min-width:0"><div class="u-name" id="uName">—</div><div class="u-role" id="uRole">—</div></div></div>
+      <button class="signout" id="signOut"><svg class="ic"><use href="#i-out"/></svg>Sign out</button>
+      <div class="idle-note">Auto-locks after 10 minutes idle</div>
+    </div>
+  </aside>
+  <div class="scrim" id="scrim"></div>
+
+  <div class="main">
+    <header class="topbar">
+      <button class="menu-btn" id="menuBtn" aria-label="Open navigation"><svg class="ic"><use href="#i-menu"/></svg></button>
+      <div class="page-title"><div class="eyebrow">MediTrack 360</div><h1 id="pageTitle">Dashboard</h1></div>
+      <form class="top-search" id="topSearch" role="search">
+        <label for="topSearchInput" class="sr">Search by Patient ID</label>
+        <input class="input" id="topSearchInput" placeholder="Patient ID, e.g. PT1002" autocomplete="off" spellcheck="false" maxlength="12">
+        <button class="btn primary" type="submit" aria-label="Search"><svg class="ic"><use href="#i-search"/></svg></button>
+      </form>
+    </header>
+    <div class="demo-banner"><svg class="ic"><use href="#i-info"/></svg><strong>Demonstration only.</strong> Fictional patients and results · student exhibition prototype · not clinically validated · data snapshot 12 Oct 2026</div>
+
+    <main class="content" id="content" tabindex="-1">
+
+      <!-- DASHBOARD -->
+      <section class="view" id="view-dashboard" data-title="Dashboard">
+        <div class="stats" id="stats"></div>
+        <div class="dash-grid">
+          <div class="dash-col">
+            <div class="panel">
+              <div class="panel-h"><h2><svg class="ic"><use href="#i-steth"/></svg>Recent hospital visits</h2><span class="sub">Select a visit to open the patient</span></div>
+              <ul class="row-list" id="recentVisits"></ul>
+            </div>
+            <div class="panel">
+              <div class="panel-h"><h2><svg class="ic"><use href="#i-cal"/></svg>Visits by month</h2><span class="sub">Nov 2025 – Oct 2026 · all demo patients</span></div>
+              <div class="chart-box"><canvas id="visitsChart" aria-label="Bar chart of hospital visits per month"></canvas></div>
+            </div>
+          </div>
+          <div class="dash-col">
+            <div class="panel quick">
+              <div class="panel-h"><h2><svg class="ic"><use href="#i-search"/></svg>Quick patient search</h2></div>
+              <form id="dashSearch">
+                <label for="dashSearchInput" class="sr">Patient ID</label>
+                <input class="input" id="dashSearchInput" placeholder="Enter Patient ID" autocomplete="off" spellcheck="false" maxlength="12">
+                <button class="btn primary" type="submit">Search</button>
+              </form>
+              <div class="demo-ids">Demo IDs:
+                <button class="chip mono" data-search="PT1001">PT1001</button>
+                <button class="chip mono" data-search="PT1002">PT1002</button>
+                <button class="chip mono" data-search="PT1003">PT1003</button>
+              </div>
+              <div id="dashMsg" style="margin-top:12px" aria-live="polite"></div>
+            </div>
+            <div class="panel">
+              <div class="panel-h"><h2><svg class="ic" style="color:var(--danger)"><use href="#i-alert"/></svg>Documented allergy alerts</h2></div>
+              <ul class="row-list" id="allergyList"></ul>
+            </div>
+            <div class="panel">
+              <div class="panel-h"><h2><svg class="ic"><use href="#i-shield"/></svg>Record access log</h2><button class="link" data-go="audit">Full audit log <svg class="ic" aria-hidden="true"><use href="#i-arrow"/></svg></button></div>
+              <ul class="log" id="accessLog"></ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SEARCH -->
+      <section class="view" id="view-search" data-title="Patient Search" hidden>
+        <div class="panel search-hero">
+          <div class="eyebrow">Search by unique Patient ID</div>
+          <h2>Find a patient record</h2>
+          <p>Enter the Patient ID printed on the patient's hospital card. The full profile opens with documented allergies shown first.</p>
+          <form class="big-search" id="mainSearch" role="search">
+            <label for="mainSearchInput" class="sr">Patient ID</label>
+            <input class="input" id="mainSearchInput" placeholder="PT1001" autocomplete="off" spellcheck="false" maxlength="12">
+            <button class="btn primary" type="submit"><svg class="ic"><use href="#i-search"/></svg>Search</button>
+          </form>
+          <div class="demo-ids">Demo IDs:
+            <button class="chip mono" data-search="PT1001">PT1001</button>
+            <button class="chip mono" data-search="PT1002">PT1002</button>
+            <button class="chip mono" data-search="PT1003">PT1003</button>
+            <button class="chip mono" data-search="PT1009" title="Shows the not-found message">PT1009 (not found)</button>
+          </div>
+          <div id="searchResult" aria-live="polite"></div>
+        </div>
+        <div class="panel qr-scan">
+          <div class="panel-h"><h2><svg class="ic"><use href="#i-qr"/></svg>Open with a patient QR code</h2></div>
+          <p>Upload a photo or screenshot of a MediTrack 360 QR code, or type the code text. The code holds only the Patient ID, and you confirm your PIN before the record opens.</p>
+          <div class="qr-row">
+            <label class="btn file-btn" for="qrFile"><svg class="ic"><use href="#i-upload"/></svg>Upload QR image<input type="file" id="qrFile" accept="image/*" class="sr"></label>
+            <form id="qrTextForm">
+              <label for="qrText" class="sr">QR code text</label>
+              <input class="input" id="qrText" placeholder="MT360:PT1001" autocomplete="off" spellcheck="false" maxlength="20">
+              <button class="btn" type="submit">Open</button>
+            </form>
+          </div>
+          <div id="qrMsg" aria-live="polite"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-h"><h2><svg class="ic"><use href="#i-shield"/></svg>How access works</h2></div>
+          <ol class="steps">
+            <li><strong>Staff sign-in</strong>Each user signs in with a Staff ID and PIN. Their role decides what they can see.</li>
+            <li><strong>Identify the patient</strong>Search the unique Patient ID or scan the patient's QR card.</li>
+            <li><strong>Authorize</strong>QR access asks the signed-in user to confirm their PIN again.</li>
+            <li><strong>Review and log</strong>The record opens with allergies first, and the access is written to the log.</li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- RECORDS -->
+      <section class="view" id="view-records" data-title="Patient Records" hidden>
+        <div id="recordsBody"></div>
+      </section>
+
+      <!-- HISTORY -->
+      <section class="view" id="view-history" data-title="Medical History" hidden>
+        <div class="toolbar">
+          <div class="field"><label for="histPatient">Patient</label><select class="input" id="histPatient"></select></div>
+          <div class="filters" id="histFilters" role="group" aria-label="Filter timeline">
+            <button class="chip" data-filter="all" aria-pressed="true">All events</button>
+            <button class="chip" data-filter="visit" aria-pressed="false">Hospital visits</button>
+            <button class="chip" data-filter="lab" aria-pressed="false">Lab investigations</button>
+            <button class="chip" data-filter="procedure" aria-pressed="false">Procedures</button>
+            <button class="chip" data-filter="med" aria-pressed="false">Medicines</button>
+            <button class="chip" data-filter="event" aria-pressed="false">Recorded events</button>
+          </div>
+        </div>
+        <div id="histBody"></div>
+      </section>
+
+      <!-- REGISTER -->
+      <section class="view" id="view-register" data-title="Patient Registration" hidden>
+        <div class="fiction-flag"><svg class="ic"><use href="#i-info"/></svg><strong>Use fictional details only</strong><span>Registrations stay in this browser tab for the demonstration and are cleared when the page reloads. Do not enter real personal or medical information.</span></div>
+        <div id="regResult"></div>
+        <form class="panel reg-form" id="regForm" novalidate>
+          <div class="panel-h"><h2><svg class="ic"><use href="#i-plus"/></svg>Register a new patient</h2><span class="sub">Patient ID on save: <strong class="mono" id="nextId">PT1004</strong></span></div>
+          <fieldset><legend>Patient details</legend>
+            <div class="form-grid">
+              <div class="field span-2"><label for="rName">Full name *</label><input class="input" id="rName" autocomplete="off" maxlength="60"></div>
+              <div class="field"><label for="rAge">Age (years) *</label><input class="input mono" id="rAge" type="number" min="0" max="120" inputmode="numeric"></div>
+              <div class="field"><label for="rSex">Sex *</label><select class="input" id="rSex"><option value="">Select…</option><option>Female</option><option>Male</option><option>Other</option></select></div>
+              <div class="field"><label for="rBlood">Blood group *</label><select class="input" id="rBlood"><option value="">Select…</option><option>A+</option><option>A−</option><option>B+</option><option>B−</option><option>AB+</option><option>AB−</option><option>O+</option><option>O−</option><option>Not known</option></select></div>
+            </div>
+          </fieldset>
+          <fieldset><legend>Contact details</legend>
+            <div class="form-grid">
+              <div class="field"><label for="rPhone">Mobile number *</label><input class="input mono" id="rPhone" inputmode="tel" placeholder="10-digit number" maxlength="16"></div>
+              <div class="field span-2"><label for="rCity">City / town</label><input class="input" id="rCity" maxlength="40"></div>
+            </div>
+          </fieldset>
+          <fieldset><legend>Emergency contact</legend>
+            <div class="form-grid">
+              <div class="field"><label for="rEName">Contact name *</label><input class="input" id="rEName" maxlength="60"></div>
+              <div class="field"><label for="rERel">Relationship *</label><input class="input" id="rERel" placeholder="e.g. Spouse, Parent" maxlength="30"></div>
+              <div class="field"><label for="rEPhone">Contact mobile *</label><input class="input mono" id="rEPhone" inputmode="tel" placeholder="10-digit number" maxlength="16"></div>
+            </div>
+          </fieldset>
+          <fieldset><legend>Medical information reported at registration (optional)</legend>
+            <div class="lbl" style="margin-bottom:8px">Known allergies</div>
+            <div id="allergyRows" class="al-rows"></div>
+            <button class="btn" type="button" id="addAllergy" style="margin-top:10px"><svg class="ic"><use href="#i-plus"/></svg>Add allergy</button>
+            <div class="form-grid" style="margin-top:16px">
+              <div class="field span-2"><label for="rCond">Previous conditions</label><input class="input" id="rCond" placeholder="Separate with commas" maxlength="200"></div>
+              <div class="field span-2"><label for="rMeds">Current medicines</label><input class="input" id="rMeds" placeholder="Separate with commas, e.g. Metformin 500 mg twice daily" maxlength="200"></div>
+            </div>
+          </fieldset>
+          <div id="regMsg" aria-live="polite"></div>
+          <div class="form-actions"><button class="btn" type="reset">Clear form</button><button class="btn primary" type="submit" id="regBtn"><svg class="ic"><use href="#i-check"/></svg>Register patient</button></div>
+        </form>
+      </section>
+
+      <!-- EMERGENCY -->
+      <section class="view" id="view-emergency" data-title="Emergency Summary" hidden>
+        <div class="toolbar">
+          <div class="field"><label for="emPatient">Patient</label><select class="input" id="emPatient"></select></div>
+        </div>
+        <div id="emBody" style="display:flex;flex-direction:column;gap:20px"></div>
+      </section>
+
+      <!-- AUDIT -->
+      <section class="view" id="view-audit" data-title="Audit Log" hidden>
+        <div class="panel">
+          <div class="panel-h"><h2><svg class="ic"><use href="#i-shield"/></svg>Record access audit log</h2><span class="sub" id="auditCount"></span></div>
+          <p style="color:var(--muted);font-size:14px;max-width:70ch;margin-bottom:14px">Every sign-in, record opening, denied access, QR authorization and registration is recorded with the staff member, role and time. In this prototype the log lives in the browser tab; a real hospital system stores it on a secure server where it cannot be edited.</p>
+          <div class="toolbar" style="margin-bottom:14px">
+            <div class="field"><label for="auditPatient">Patient</label><select class="input" id="auditPatient"></select></div>
+            <div class="field"><label for="auditUser">Staff member</label><select class="input" id="auditUser"></select></div>
+          </div>
+          <div id="auditTable"></div>
+        </div>
+      </section>
+
+      <!-- LABS -->
+      <section class="view" id="view-labs" data-title="Laboratory Reports" hidden>
+        <div class="toolbar">
+          <div class="field"><label for="labPatient">Patient</label><select class="input" id="labPatient"></select></div>
+        </div>
+        <div id="labBody" style="display:flex;flex-direction:column;gap:20px"></div>
+      </section>
+
+      <!-- ABOUT -->
+      <section class="view" id="view-about" data-title="About the Project" hidden>
+        <div class="about-hero">
+          <div class="eyebrow">State-Level Science Exhibition · Student prototype</div>
+          <h2>From a shelf of paper files to one organized digital history</h2>
+          <p>MediTrack 360 shows how a hospital could give authorized doctors a patient's past visits, allergies, medications and laboratory results through a single unique Patient ID, with privacy protections built into every step.</p>
+        </div>
+        <div class="grid-2">
+          <div class="panel prose">
+            <div class="panel-h"><h3><svg class="ic"><use href="#i-file"/></svg>The problem</h3></div>
+            <p>In many hospitals and clinics, a patient's history lives in physical files: handwritten notes, printed lab slips and discharge summaries stored in folders and record rooms.</p>
+            <p>Finding a file means searching by name through shelves or registers. Files get misplaced or split across departments, handwriting can be hard to read, and an allergy noted years ago can sit buried on page twelve. When a patient arrives in an emergency or visits a new department, the doctor may not see that history in time.</p>
+          </div>
+          <div class="panel prose">
+            <div class="panel-h"><h3><svg class="ic"><use href="#i-check"/></svg>How MediTrack 360 helps</h3></div>
+            <p>Every patient gets a unique Patient ID. An authorized doctor enters the ID, or scans the patient's QR card, and sees one organized profile.</p>
+            <ul class="ticks" style="margin-top:12px">
+              <li><svg class="ic"><use href="#i-check"/></svg>Documented allergies are shown first in a red alert card</li>
+              <li><svg class="ic"><use href="#i-check"/></svg>Visits, investigations and procedures in one chronological timeline</li>
+              <li><svg class="ic"><use href="#i-check"/></svg>Lab results charted against reference ranges and comparable across dates</li>
+              <li><svg class="ic"><use href="#i-check"/></svg>Medication records shown exactly as documented by doctors</li>
+              <li><svg class="ic"><use href="#i-check"/></svg>Registration generates a unique Patient ID with contact and emergency contact details</li>
+              <li><svg class="ic"><use href="#i-check"/></svg>An emergency summary puts blood group, allergies, current medicines and the emergency contact on one screen</li>
+              <li><svg class="ic"><use href="#i-check"/></svg>An audit log records who opened which record, and when</li>
+            </ul>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-h"><h3><svg class="ic"><use href="#i-clip"/></svg>Paper files compared with MediTrack 360</h3></div>
+          <div class="table-wrap">
+            <table class="cmp-table">
+              <thead><tr><th>Task</th><th>Physical files</th><th>MediTrack 360</th></tr></thead>
+              <tbody>
+                <tr><td>Finding a record</td><td>Search shelves or registers by name; names can repeat</td><td>Enter one unique Patient ID or scan a QR card</td></tr>
+                <tr><td>Allergy visibility</td><td>Depends on someone reading every page</td><td>Shown first, highlighted, on every screen for that patient</td></tr>
+                <tr><td>Comparing lab results</td><td>Flip through separate printed slips</td><td>Trend chart and side-by-side comparison of any two dates</td></tr>
+                <tr><td>Who looked at the file</td><td>Usually not recorded</td><td>Every record opening is written to an access log</td></tr>
+                <tr><td>Access control</td><td>Anyone with the folder can read it</td><td>Sign-in, role-based permissions and PIN confirmation</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="panel">
+            <div class="panel-h"><h3><svg class="ic"><use href="#i-shield"/></svg>Privacy and safety by design</h3></div>
+            <ul class="ticks">
+              <li><svg class="ic"><use href="#i-check"/></svg>Only signed-in staff can open records; the front-desk role sees identity and allergies but not clinical details</li>
+              <li><svg class="ic"><use href="#i-check"/></svg>QR codes contain only the Patient ID, so a lost card reveals no medical information</li>
+              <li><svg class="ic"><use href="#i-check"/></svg>Opening a record from a QR code requires the user's PIN</li>
+              <li><svg class="ic"><use href="#i-check"/></svg>Three wrong PINs or 10 minutes of inactivity lock the session</li>
+              <li><svg class="ic"><use href="#i-check"/></svg>The system never generates diagnoses or recommends medicines; it only displays what was documented</li>
+            </ul>
+          </div>
+          <div class="panel">
+            <div class="panel-h"><h3><svg class="ic" style="color:var(--warn)"><use href="#i-alert"/></svg>Limitations of this prototype</h3></div>
+            <ul class="ticks warn">
+              <li><svg class="ic"><use href="#i-info"/></svg>All patients, doctors and results are fictional and built into the page</li>
+              <li><svg class="ic"><use href="#i-info"/></svg>Sign-in runs in the browser to demonstrate the workflow. A real deployment needs server-side authentication, encrypted storage and audited access</li>
+              <li><svg class="ic"><use href="#i-info"/></svg>New registrations and the audit log are kept only in the open browser tab and clear on reload, so no personal data is stored</li>
+              <li><svg class="ic"><use href="#i-info"/></svg>Not connected to any hospital database and not clinically validated</li>
+            </ul>
+          </div>
+        </div>
+        <div class="panel prose">
+          <div class="panel-h"><h3><svg class="ic"><use href="#i-arrow"/></svg>Future scope</h3></div>
+          <p>A full version could store records on a secure hospital server with encryption, use two-factor sign-in for staff, exchange data with other hospitals through health-data standards such as HL7 FHIR, and let patients view their own records with consent controls.</p>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<!-- QR dialog -->
+<dialog id="qrDialog" aria-labelledby="qrTitle">
+  <div class="dlg-head"><h2 id="qrTitle"><svg class="ic"><use href="#i-qr"/></svg><span id="qrTitleText">Patient QR code</span></h2><button class="icon-btn" data-close aria-label="Close"><svg class="ic"><use href="#i-x"/></svg></button></div>
+  <div class="dlg-body">
+    <div class="qr-body">
+      <div class="qr-frame"><div id="qrCanvas"></div></div>
+      <div class="qr-info">
+        <div><div class="lbl" style="margin-bottom:4px">Encoded text</div><div class="qr-payload" id="qrPayload">MT360:PT1001</div></div>
+        <ul class="ticks">
+          <li><svg class="ic"><use href="#i-check"/></svg>Contains only the Patient ID</li>
+          <li><svg class="ic"><use href="#i-check"/></svg>No name, conditions or results inside the code</li>
+          <li><svg class="ic"><use href="#i-check"/></svg>Scanning asks the signed-in user for their PIN</li>
+        </ul>
+      </div>
+    </div>
+    <div id="qrGenMsg"></div>
+  </div>
+  <div class="dlg-foot">
+    <button class="btn" id="qrCopy"><svg class="ic"><use href="#i-copy"/></svg>Copy code text</button>
+    <button class="btn primary" id="qrTry"><svg class="ic"><use href="#i-qr"/></svg>Test scan flow</button>
+  </div>
+</dialog>
+
+<!-- Authorization dialog -->
+<dialog id="authDialog" aria-labelledby="authTitle">
+  <form id="authForm" novalidate>
+    <div class="dlg-head"><h2 id="authTitle"><svg class="ic"><use href="#i-lock"/></svg>Authorize record access</h2><button class="icon-btn" type="button" data-close aria-label="Cancel"><svg class="ic"><use href="#i-x"/></svg></button></div>
+    <div class="dlg-body">
+      <p id="authText">QR code detected. Enter your PIN to open this record.</p>
+      <div class="field"><label for="authPin">Your PIN</label><input class="input mono" id="authPin" type="password" inputmode="numeric" autocomplete="off" maxlength="6"></div>
+      <div id="authMsg" aria-live="polite"></div>
+    </div>
+    <div class="dlg-foot">
+      <button class="btn" type="button" data-close>Cancel</button>
+      <button class="btn primary" type="submit">Authorize and open</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script src="js/chart.umd.js"></script>
+<script src="js/qrcode.min.js"></script>
+<script src="js/jsQR.js"></script>
+<script>
+(function(){
+"use strict";
+
+/* ============ FICTIONAL DEMO DATA ============ */
+const DEMO_TODAY = "2026-10-12";
+const FAC = "Demo General Hospital";
+const PATIENTS = {
+  PT1001:{
+    id:"PT1001", demo:true, name:"Arjun Mehta", age:58, sex:"Male", blood:"B+", registered:"2015-02-11",
+    phone:"+91 90000 10011", city:"Chennai",
+    emergency:{name:"Meera Mehta", relation:"Spouse", phone:"+91 90000 10012"},
+    conditions:[
+      {name:"Type 2 diabetes mellitus", date:"2016-04-12", status:"Ongoing", by:"Dr. S. Narayan"},
+      {name:"Hypertension", date:"2018-09-03", status:"Ongoing", by:"Dr. M. Pillai"},
+      {name:"Dyslipidaemia", date:"2021-01-27", status:"Ongoing", by:"Dr. S. Narayan"}
+    ],
+    surgeries:[{name:"Laparoscopic appendectomy", date:"2009-06-14", facility:"Riverside City Hospital", notes:"Recovered without recorded complications"}],
+    allergies:[
+      {allergen:"Penicillin", reaction:"Anaphylaxis", severity:"Severe", date:"2011-03-02"},
+      {allergen:"Sulfonamide antibiotics", reaction:"Widespread skin rash", severity:"Moderate", date:"2017-08-19"}
+    ],
+    meds:[
+      {name:"Metformin", dose:"500 mg", freq:"Twice daily", since:"2016", date:"2016-04-12", by:"Dr. S. Narayan"},
+      {name:"Amlodipine", dose:"5 mg", freq:"Once daily", since:"2018", date:"2018-09-03", by:"Dr. M. Pillai"},
+      {name:"Atorvastatin", dose:"10 mg", freq:"Once daily, night", since:"2021", date:"2021-01-27", by:"Dr. S. Narayan"}
+    ],
+    visits:[
+      {date:"2026-09-22", dept:"Endocrinology", kind:"OPD", reason:"Routine diabetes review", doctor:"Dr. S. Narayan"},
+      {date:"2026-06-10", dept:"General Medicine", kind:"OPD", reason:"Blood pressure follow-up", doctor:"Dr. M. Pillai"},
+      {date:"2026-03-04", dept:"Endocrinology", kind:"OPD", reason:"Quarterly review", doctor:"Dr. S. Narayan"},
+      {date:"2025-11-18", dept:"Emergency", kind:"Emergency", reason:"Reported dizziness; observed for 6 hours and discharged the same day", doctor:"Dr. J. Varghese"},
+      {date:"2025-09-02", dept:"Ophthalmology", kind:"OPD", reason:"Annual retinal screening", doctor:"Dr. N. Krishnan"}
+    ],
+    labs:{panel:"Diabetes and lipid panel", dates:["2025-09-01","2025-12-05","2026-03-03","2026-06-09","2026-09-21"], tests:[
+      {key:"hba1c", name:"HbA1c", unit:"%", low:4.0, high:5.6, ref:"4.0 – 5.6", dp:1, values:[8.1,7.8,7.4,7.1,6.9]},
+      {key:"fbg", name:"Fasting glucose", unit:"mg/dL", low:70, high:99, ref:"70 – 99", dp:0, values:[162,151,140,132,126]},
+      {key:"ldl", name:"LDL cholesterol", unit:"mg/dL", low:0, high:100, ref:"< 100", dp:0, values:[148,131,118,104,96]},
+      {key:"cr", name:"Serum creatinine", unit:"mg/dL", low:0.7, high:1.3, ref:"0.7 – 1.3", dp:1, values:[1.0,1.0,1.1,1.0,1.1]}
+    ]}
+  },
+  PT1002:{
+    id:"PT1002", demo:true, name:"Priya Raman", age:34, sex:"Female", blood:"O−", registered:"2012-07-23",
+    phone:"+91 90000 20021", city:"Coimbatore",
+    emergency:{name:"Lakshmi Raman", relation:"Mother", phone:"+91 90000 20022"},
+    conditions:[
+      {name:"Bronchial asthma", date:"2012-07-23", status:"Ongoing", by:"Dr. R. Thomas"},
+      {name:"Iron-deficiency anaemia", date:"2025-10-07", status:"Under follow-up", by:"Dr. K. Bose"}
+    ],
+    surgeries:[],
+    allergies:[
+      {allergen:"Peanuts", reaction:"Throat swelling and hives", severity:"Severe", date:"2012-07-23"},
+      {allergen:"Latex", reaction:"Contact dermatitis", severity:"Moderate", date:"2019-05-16"}
+    ],
+    meds:[
+      {name:"Salbutamol inhaler", dose:"100 mcg per puff", freq:"As needed", since:"2015", date:"2015-03-10", by:"Dr. R. Thomas"},
+      {name:"Ferrous sulfate", dose:"200 mg", freq:"Once daily", since:"2025", date:"2025-10-07", by:"Dr. K. Bose"}
+    ],
+    visits:[
+      {date:"2026-08-28", dept:"Haematology", kind:"OPD", reason:"Iron studies review", doctor:"Dr. K. Bose"},
+      {date:"2026-05-14", dept:"Pulmonology", kind:"OPD", reason:"Asthma review; spirometry recorded", doctor:"Dr. R. Thomas"},
+      {date:"2026-02-20", dept:"Haematology", kind:"OPD", reason:"Follow-up visit", doctor:"Dr. K. Bose"},
+      {date:"2025-12-11", dept:"Emergency", kind:"Emergency", reason:"Breathing difficulty during cold weather; treated in the emergency department and discharged", doctor:"Dr. J. Varghese"},
+      {date:"2025-10-07", dept:"General Medicine", kind:"OPD", reason:"Evaluation of tiredness", doctor:"Dr. M. Pillai"}
+    ],
+    labs:{panel:"Haematology panel", dates:["2025-10-06","2026-02-19","2026-05-13","2026-08-27"], tests:[
+      {key:"hb", name:"Haemoglobin", unit:"g/dL", low:12.0, high:15.5, ref:"12.0 – 15.5", dp:1, values:[9.8,10.9,11.8,12.4]},
+      {key:"ferr", name:"Serum ferritin", unit:"ng/mL", low:15, high:150, ref:"15 – 150", dp:0, values:[8,18,29,41]},
+      {key:"wbc", name:"WBC count", unit:"×10³/µL", low:4.0, high:11.0, ref:"4.0 – 11.0", dp:1, values:[7.2,8.9,6.8,7.0]},
+      {key:"plt", name:"Platelet count", unit:"×10³/µL", low:150, high:410, ref:"150 – 410", dp:0, values:[312,298,305,290]}
+    ]}
+  },
+  PT1003:{
+    id:"PT1003", demo:true, name:"Kavin Joseph", age:72, sex:"Male", blood:"A+", registered:"2010-11-05",
+    phone:"+91 90000 30031", city:"Madurai",
+    emergency:{name:"Daniel Joseph", relation:"Son", phone:"+91 90000 30032"},
+    conditions:[
+      {name:"Osteoarthritis, both knees", date:"2017-03-14", status:"Ongoing", by:"Dr. P. Rao"},
+      {name:"Chronic kidney disease, stage 3a", date:"2020-08-21", status:"Ongoing", by:"Dr. L. Menon"},
+      {name:"Atrial fibrillation", date:"2021-06-02", status:"Ongoing", by:"Dr. A. Fernandes"}
+    ],
+    surgeries:[
+      {name:"Right total knee replacement", date:"2022-01-18", facility:FAC, notes:"Five-day admission; recorded as uneventful"},
+      {name:"Cataract surgery, left eye", date:"2020-07-09", facility:FAC, notes:"Day-care procedure"}
+    ],
+    allergies:[
+      {allergen:"Iodinated contrast media", reaction:"Hives and itching", severity:"Moderate", date:"2021-06-02"},
+      {allergen:"Codeine", reaction:"Nausea and vomiting", severity:"Mild", date:"2017-03-20"}
+    ],
+    meds:[
+      {name:"Apixaban", dose:"2.5 mg", freq:"Twice daily", since:"2021", date:"2021-06-02", by:"Dr. A. Fernandes"},
+      {name:"Bisoprolol", dose:"2.5 mg", freq:"Once daily", since:"2021", date:"2021-06-02", by:"Dr. A. Fernandes"},
+      {name:"Paracetamol", dose:"500 mg", freq:"As needed for knee pain", since:"2017", date:"2017-03-14", by:"Dr. P. Rao"}
+    ],
+    visits:[
+      {date:"2026-09-30", dept:"Nephrology", kind:"OPD", reason:"Kidney function review", doctor:"Dr. L. Menon"},
+      {date:"2026-07-15", dept:"Cardiology", kind:"OPD", reason:"Heart rhythm review; ECG recorded", doctor:"Dr. A. Fernandes"},
+      {date:"2026-04-02", dept:"Nephrology", kind:"OPD", reason:"Routine review", doctor:"Dr. L. Menon"},
+      {date:"2026-01-25", dept:"Cardiology ward", kind:"Inpatient", reason:"Admitted for observation with palpitations; discharged after 3 days", doctor:"Dr. A. Fernandes"},
+      {date:"2025-10-20", dept:"Orthopaedics", kind:"OPD", reason:"Knee replacement follow-up", doctor:"Dr. P. Rao"}
+    ],
+    labs:{panel:"Renal and blood panel", dates:["2025-10-19","2026-01-24","2026-04-01","2026-07-14","2026-09-29"], tests:[
+      {key:"cr", name:"Serum creatinine", unit:"mg/dL", low:0.7, high:1.3, ref:"0.7 – 1.3", dp:1, values:[1.6,1.7,1.6,1.5,1.5]},
+      {key:"egfr", name:"eGFR", unit:"mL/min/1.73m²", low:60, high:120, ref:"≥ 60", dp:0, values:[44,41,45,48,48]},
+      {key:"k", name:"Potassium", unit:"mmol/L", low:3.5, high:5.1, ref:"3.5 – 5.1", dp:1, values:[4.9,5.3,5.0,4.8,4.7]},
+      {key:"hb", name:"Haemoglobin", unit:"g/dL", low:13.0, high:17.0, ref:"13.0 – 17.0", dp:1, values:[12.1,11.8,12.3,12.6,12.9]}
+    ]}
+  }
+};
+const ids = ()=>Object.keys(PATIENTS);
+/* Demo staff accounts (fictional). Real systems verify credentials on a server. */
+const USERS = {
+  "DR-2041":{pin:"4321", name:"Dr. Ananya Iyer", role:"doctor", roleLabel:"Physician · full access"},
+  "FD-1107":{pin:"2468", name:"Ravi Kumar", role:"frontdesk", roleLabel:"Front desk · limited access"}
+};
+const VIEWS = {dashboard:"Dashboard", search:"Patient Search", register:"Patient Registration", records:"Patient Records", history:"Medical History", emergency:"Emergency Summary", labs:"Laboratory Reports", audit:"Audit Log", about:"About the Project"};
+const IDLE_MS = 10*60*1000;
+
+/* ============ STATE ============ */
+const state = {user:null, view:"dashboard", active:null, histFilter:"all", labTest:null, cmp:{pid:null,a:0,b:0},
+  log:[], charts:{}, lastActivity:Date.now(), pinFails:0, loginFails:0, loginLockUntil:0, pendingQr:null, busy:false, silentHash:false};
+
+/* ============ HELPERS ============ */
+const $ = (s,r=document)=>r.querySelector(s);
+const $$ = (s,r=document)=>Array.from(r.querySelectorAll(s));
+const esc = s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const icon = (n,extra="")=>`<svg class="ic" ${extra} aria-hidden="true"><use href="#i-${n}"/></svg>`;
+const dt = iso=>new Date(iso+"T00:00:00");
+const fmtDate = iso=>dt(iso).toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"});
+const fmtShort = iso=>dt(iso).toLocaleDateString("en-GB",{month:"short",year:"2-digit"});
+const daysBetween = (a,b)=>Math.round((dt(b)-dt(a))/86400000);
+const initials = n=>esc(n.replace(/^Dr\.\s*/,"").split(/\s+/).map(w=>w[0]).slice(0,2).join("").toUpperCase());
+const isDoctor = ()=>state.user && state.user.role==="doctor";
+const fmtVal = (t,v)=>Number(v).toFixed(t.dp);
+const outOf = (t,v)=>v<t.low||v>t.high ? (v<t.low?"L":"H") : "";
+const reducedMotion = ()=>window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+const tok = n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const reMsg = (type,text,extra="")=>`<div class="msg ${type}">${icon(type==="error"?"alert":"info")}<div>${text}${extra}</div></div>`;
+const loadingHTML = t=>`<div class="loading"><span class="spinner"></span>${esc(t)}</div><div class="skel"><i></i><i></i><i></i></div>`;
+
+let toastTimer;
+function toast(text){
+  const t=$("#toast"); t.textContent=text; t.hidden=false;
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>{t.hidden=true},3200);
+}
+function logAccess(action,id){
+  const u=state.user;
+  state.log.unshift({t:new Date(), user:u?u.name:"—", staffId:u?u.staffId:"—", role:u?u.roleLabel.split(" · ")[0]:"—", action, id:id||""});
+  if(state.view==="dashboard") renderLog();
+  if(state.view==="audit") renderAudit();
+}
+function destroyChart(k){ if(state.charts[k]){ state.charts[k].destroy(); delete state.charts[k]; } }
+function noteView(view,label,allowed){
+  if(!state.active) return;
+  const k=view+":"+state.active+(allowed?"":":deny");
+  if(state.lastViewKey===k) return;
+  state.lastViewKey=k;
+  logAccess(allowed?`Viewed ${label}`:`Access denied · ${label}`,state.active);
+}
+
+/* ============ AUTH ============ */
+$$("[data-cred]").forEach(b=>b.addEventListener("click",()=>{
+  const [id,pin]=b.dataset.cred.split("|"); $("#staffId").value=id; $("#staffPin").value=pin; $("#loginMsg").innerHTML=""; $("#loginBtn").focus();
+}));
+$("#loginForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  const msg=$("#loginMsg"), btn=$("#loginBtn");
+  const sid=$("#staffId").value.trim().toUpperCase(), pin=$("#staffPin").value.trim();
+  if(Date.now()<state.loginLockUntil){
+    const s=Math.ceil((state.loginLockUntil-Date.now())/1000);
+    msg.innerHTML=reMsg("error",`Sign-in is paused after 5 failed attempts. Try again in ${s} seconds.`); return;
+  }
+  if(!sid||!pin){ msg.innerHTML=reMsg("error","Enter both your Staff ID and PIN."); return; }
+  btn.disabled=true; btn.innerHTML='<span class="spinner"></span>Verifying…'; msg.innerHTML="";
+  setTimeout(()=>{
+    btn.disabled=false; btn.textContent="Sign in";
+    const u=USERS[sid];
+    if(!u||u.pin!==pin){
+      state.loginFails++;
+      if(state.loginFails>=5){ state.loginLockUntil=Date.now()+30000; state.loginFails=0;
+        msg.innerHTML=reMsg("error","Too many failed attempts. Sign-in is paused for 30 seconds."); }
+      else msg.innerHTML=reMsg("error","Staff ID or PIN is incorrect. Use one of the demo accounts listed below.");
+      $("#staffPin").value=""; $("#staffPin").focus(); return;
+    }
+    state.loginFails=0; state.user={...u, staffId:sid}; state.pinFails=0; state.lastActivity=Date.now();
+    startApp();
+  },550);
+});
+function startApp(){
+  $("#login").hidden=true; $("#app").hidden=false;
+  $("#uAv").textContent=initials(state.user.name);
+  $("#uName").textContent=state.user.name;
+  $("#uRole").textContent=state.user.roleLabel;
+  $$(".nav-item .lk").forEach(n=>n.remove());
+  if(!isDoctor()) ["history","emergency","labs"].forEach(v=>{
+    const b=$(`.nav-item[data-view="${v}"]`); b.insertAdjacentHTML("beforeend",`<svg class="ic lk" aria-label="Restricted"><use href="#i-lock"/></svg>`);
+  });
+  logAccess("Signed in");
+  let h=""; try{ h=location.hash.slice(1); }catch(_){}
+  go(!state.signedInBefore && VIEWS[h]?h:"dashboard");
+  state.signedInBefore=true;
+}
+function signOut(reason){
+  if(!state.user) return;
+  logAccess("Signed out");
+  Object.keys(state.charts).forEach(destroyChart);
+  state.user=null; state.active=null; state.pendingQr=null;
+  $$("dialog[open]").forEach(d=>d.close());
+  closeNav(); $("#app").hidden=true; $("#login").hidden=false;
+  $("#staffPin").value="";
+  $("#loginMsg").innerHTML=reMsg("info",esc(reason||"You have signed out."));
+  ["#searchResult","#dashMsg","#qrMsg"].forEach(s=>{$(s).innerHTML=""});
+}
+$("#signOut").addEventListener("click",()=>signOut("You have signed out. Patient records are hidden until someone signs in."));
+["pointerdown","keydown"].forEach(ev=>document.addEventListener(ev,()=>{state.lastActivity=Date.now()},{passive:true}));
+setInterval(()=>{ if(state.user && Date.now()-state.lastActivity>IDLE_MS) signOut("Session locked after 10 minutes without activity. Sign in again to continue."); },15000);
+
+/* ============ ROUTING ============ */
+function go(view,opts={}){
+  if(!VIEWS[view]) view="dashboard";
+  state.view=view;
+  $$(".view").forEach(s=>{s.hidden = s.id!=="view-"+view});
+  $$(".nav-item").forEach(b=>{ if(b.dataset.view===view) b.setAttribute("aria-current","page"); else b.removeAttribute("aria-current"); });
+  $("#pageTitle").textContent=VIEWS[view];
+  closeNav();
+  renderView(opts);
+  try{ if(location.hash.slice(1)!==view){ state.silentHash=true; location.hash=view; } }catch(_){ state.silentHash=false; }
+  window.scrollTo({top:0,behavior:"auto"});
+}
+window.addEventListener("hashchange",()=>{
+  if(state.silentHash){ state.silentHash=false; return; }
+  let h=""; try{ h=location.hash.slice(1); }catch(_){}
+  if(state.user && VIEWS[h] && h!==state.view) go(h);
+});
+function renderView(opts={}){
+  if(!state.user) return;
+  ({dashboard:renderDashboard, search:()=>{}, register:renderRegister, records:renderRecords, history:renderHistory, emergency:renderEmergency, labs:renderLabs, audit:renderAudit, about:()=>{}})[state.view](opts);
+}
+$$(".nav-item").forEach(b=>b.addEventListener("click",()=>go(b.dataset.view)));
+function closeNav(){ $("#app").classList.remove("nav-open"); }
+$("#menuBtn").addEventListener("click",()=>$("#app").classList.add("nav-open"));
+$("#scrim").addEventListener("click",closeNav);
+document.addEventListener("keydown",e=>{ if(e.key==="Escape") closeNav(); });
+
+/* ============ SEARCH ============ */
+function normalizeId(raw){ return String(raw||"").toUpperCase().replace(/[\s\-_]/g,""); }
+function doSearch(raw,out){
+  if(state.busy) return;
+  const id=normalizeId(raw);
+  const chips=ids().map(i=>`<button class="chip mono" data-search="${i}">${i}</button>`).join("");
+  if(!id){ out.innerHTML=reMsg("error","Enter a Patient ID to search, for example PT1001."); return; }
+  if(!/^PT\d{4}$/.test(id)){
+    out.innerHTML=reMsg("error",`<strong>“${esc(String(raw).trim())}” is not a valid Patient ID.</strong><br>Patient IDs are PT followed by four digits, for example PT1001.`); return;
+  }
+  state.busy=true;
+  out.innerHTML=loadingHTML(`Retrieving record ${id}…`);
+  setTimeout(()=>{
+    state.busy=false;
+    if(!state.user) return;
+    if(!PATIENTS[id]){
+      logAccess("Search returned no match",id);
+      out.innerHTML=reMsg("error",`<strong>No patient found with ID ${id}.</strong><br>Check the ID on the patient's card and try again.`,`<div class="msg-actions">${chips}</div>`);
+      return;
+    }
+    out.innerHTML="";
+    openPatient(id,"ID search",true);
+  },700);
+}
+$("#mainSearch").addEventListener("submit",e=>{e.preventDefault(); doSearch($("#mainSearchInput").value,$("#searchResult"));});
+$("#dashSearch").addEventListener("submit",e=>{e.preventDefault(); doSearch($("#dashSearchInput").value,$("#dashMsg"));});
+$("#topSearch").addEventListener("submit",e=>{
+  e.preventDefault(); const v=$("#topSearchInput").value;
+  go("search"); $("#mainSearchInput").value=v; doSearch(v,$("#searchResult")); $("#topSearchInput").value="";
+});
+
+function openPatient(id,src,nav){
+  if(!PATIENTS[id]) return;
+  state.active=id;
+  logAccess(`Opened record · ${src}`,id);
+  state.lastViewKey=(nav?"records":state.view)+":"+id;
+  if(nav) go("records",{flash:true}); else renderView({flash:true});
+}
+
+/* delegated clicks */
+document.addEventListener("click",e=>{
+  const s=e.target.closest("[data-search]");
+  if(s){ const box=s.closest("#view-dashboard")?$("#dashMsg"):$("#searchResult");
+    if(box===$("#searchResult")){ if(state.view!=="search") go("search"); $("#mainSearchInput").value=s.dataset.search; }
+    else $("#dashSearchInput").value=s.dataset.search;
+    doSearch(s.dataset.search,box); return; }
+  const o=e.target.closest("[data-open]");
+  if(o){ openPatient(o.dataset.open,o.dataset.src||"Directory",o.dataset.stay!=="1"); return; }
+  const g=e.target.closest("[data-go]");
+  if(g){ go(g.dataset.go); return; }
+  const em=e.target.closest("[data-em]");
+  if(em){ state.active=em.dataset.em; go("emergency"); return; }
+  const q=e.target.closest("[data-qr]");
+  if(q){ showQr(q.dataset.qr); return; }
+  const c=e.target.closest("[data-close]");
+  if(c){ c.closest("dialog").close(); return; }
+  const f=e.target.closest("[data-filter]");
+  if(f){ state.histFilter=f.dataset.filter; renderHistory(); return; }
+  const t=e.target.closest("[data-test]");
+  if(t){ state.labTest=t.dataset.test; renderTrend(PATIENTS[state.active]); return; }
+});
+
+/* ============ DASHBOARD ============ */
+function allVisits(){ return ids().flatMap(id=>PATIENTS[id].visits.map(v=>({...v,pid:id,pname:PATIENTS[id].name}))).sort((a,b)=>b.date.localeCompare(a.date)); }
+function renderDashboard(){
+  const records=ids().reduce((n,id)=>{const p=PATIENTS[id]; return n+p.visits.length+p.labs.dates.length+p.surgeries.length+p.conditions.length},0);
+  const visits=allVisits();
+  const recent=visits.filter(v=>daysBetween(v.date,DEMO_TODAY)<=90);
+  const allergies=ids().flatMap(id=>PATIENTS[id].allergies.map(a=>({...a,pid:id,pname:PATIENTS[id].name})));
+  const order={Severe:0,Moderate:1,Mild:2};
+  allergies.sort((a,b)=>order[a.severity]-order[b.severity]);
+  const severe=allergies.filter(a=>a.severity==="Severe").length;
+  const stats=[
+    {i:"users",l:"Total demo patients",v:ids().length,s:ids().length>3?`3 built-in · ${ids().length-3} registered this session`:"Fictional profiles PT1001–PT1003"},
+    {i:"file",l:"Total medical records",v:records,s:"Visits, lab reports, procedures, diagnoses"},
+    {i:"steth",l:"Recent hospital visits",v:recent.length,s:"Last 90 days"},
+    {i:"alert",l:"Documented allergy alerts",v:allergies.length,s:`${severe} marked severe`,d:1}
+  ];
+  $("#stats").innerHTML=stats.map(s=>`<div class="stat ${s.d?"danger":""}"><div class="stat-top"><div class="stat-lbl">${s.l}</div><div class="stat-ico">${icon(s.i)}</div></div><div class="stat-val">${s.v}</div><div class="stat-sub">${s.s}</div></div>`).join("");
+  $("#recentVisits").innerHTML=visits.slice(0,6).map(v=>`<li><button class="row-btn" data-open="${v.pid}" data-src="Dashboard visit list">
+      <span class="row-date">${fmtDate(v.date)}</span>
+      <span class="row-main"><strong>${esc(v.pname)} <span class="mono" style="font-size:12.5px">· ${v.pid}</span></strong><span>${esc(v.dept)} · ${esc(v.doctor)}</span></span>
+      <span class="badge k-${v.kind.toLowerCase()}">${v.kind}</span></button></li>`).join("");
+  $("#allergyList").innerHTML=allergies.map(a=>`<li><button class="row-btn" style="grid-template-columns:minmax(0,1fr) auto" data-open="${a.pid}" data-src="Allergy alert list">
+      <span class="row-main"><strong>${esc(a.allergen)}</strong><span>${esc(a.pname)} · <span class="mono">${a.pid}</span> · ${esc(a.reaction)}</span></span>
+      <span class="sev sev-${a.severity.toLowerCase()}">${a.severity}</span></button></li>`).join("");
+  renderLog();
+  drawVisitsChart();
+}
+function renderLog(){
+  const el=$("#accessLog");
+  el.innerHTML=state.log.length?state.log.slice(0,8).map(l=>`<li><time>${l.t.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"})}</time><span>${esc(l.action)}${l.id?` <span class="mono">${l.id}</span>`:""}<br><span class="who">${esc(l.user)}</span></span></li>`).join("")
+    :`<li><time>—</time><span class="who">No activity yet.</span></li>`;
+}
+function drawVisitsChart(){
+  const cv=$("#visitsChart"); destroyChart("visits"); if(!cv) return;
+  if(typeof Chart==="undefined"){ cv.hidden=true; if(!cv.parentElement.querySelector(".note")) cv.insertAdjacentHTML("afterend",'<p class="note">The chart library could not load. Visit details are listed above.</p>'); cv.parentElement.style.height="auto"; return; }
+  const months=[]; for(let i=0;i<12;i++){ const d=new Date(2025,10+i,1); months.push({k:`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`, l:d.toLocaleDateString("en-GB",{month:"short"})}); }
+  const counts=months.map(m=>allVisits().filter(v=>v.date.startsWith(m.k)).length);
+  state.charts.visits=new Chart(cv,{type:"bar",
+    data:{labels:months.map(m=>m.l),datasets:[{label:"Visits",data:counts,backgroundColor:tok("--accent"),borderRadius:5,maxBarThickness:34}]},
+    options:{responsive:true,maintainAspectRatio:false,animation:{duration:reducedMotion()?0:600},
+      plugins:{legend:{display:false},tooltip:{callbacks:{title:c=>months[c[0].dataIndex].k,label:c=>`${c.parsed.y} visit${c.parsed.y===1?"":"s"}`}}},
+      scales:{y:{beginAtZero:true,suggestedMax:3,ticks:{stepSize:1,precision:0,color:tok("--muted")},grid:{color:tok("--line")},border:{display:false}},
+              x:{ticks:{color:tok("--muted")},grid:{display:false}}}}});
+}
+
+/* ============ PATIENT RECORDS ============ */
+function allergyCard(p){
+  if(!p.allergies.length) return `<section class="no-allergy">${icon("check")} No allergies documented for this patient.</section>`;
+  return `<section class="allergy-alert" id="allergyAlert" role="alert" aria-label="Allergy alert">
+    <div class="aa-icon">${icon("alert")}</div>
+    <div class="aa-body">
+      <div class="aa-title">Allergy alert<span>${p.allergies.length} documented ${p.allergies.length===1?"allergy":"allergies"} · ${esc(p.name)}</span></div>
+      <ul class="aa-list">${p.allergies.map(a=>`<li><strong>${esc(a.allergen)}</strong><span class="aa-react">${esc(a.reaction)}</span><span class="sev sev-${a.severity.toLowerCase()}">${a.severity}</span><span class="aa-date">Recorded ${fmtDate(a.date)}</span></li>`).join("")}</ul>
+      <p class="aa-foot">Shown as documented in the record. Confirm allergy history with the patient.</p>
+    </div></section>`;
+}
+function allergyStrip(p){
+  if(!p.allergies.length) return "";
+  return `<div class="allergy-strip"><strong>${icon("alert")}Allergies</strong>${p.allergies.map(a=>`<span>${esc(a.allergen)} <span class="sev sev-${a.severity.toLowerCase()}">${a.severity}</span></span>`).join("")}</div>`;
+}
+function restrictedCard(){
+  return `<div class="restricted">${icon("lock")}<div><strong>Clinical record restricted for your role</strong><p>You are signed in as ${esc(state.user.roleLabel.split(" · ")[0])}. This role can register patients, confirm identity and contact details, and see allergy alerts. Medical conditions, visits, medications and laboratory reports are visible only to physicians.</p></div></div>`;
+}
+function emptyState(title,text){
+  return `<div class="panel empty">${icon("search")}<strong>${title}</strong><p>${text}</p><div class="demo-ids" style="justify-content:center">${ids().map(i=>`<button class="chip mono" data-open="${i}" data-src="Patient selector" data-stay="1">${i} · ${esc(PATIENTS[i].name)}</button>`).join("")}</div></div>`;
+}
+function renderRecords(opts={}){
+  const body=$("#recordsBody");
+  const dir=`<div class="directory" role="group" aria-label="Patients">${ids().map(id=>{const p=PATIENTS[id];
+    return `<button class="dir-card" data-open="${id}" data-src="Patient directory" data-stay="1" aria-pressed="${state.active===id}">
+      <span class="av">${initials(p.name)}</span><span class="dir-txt"><strong>${esc(p.name)}</strong><span class="mono">${id}</span><span> · ${p.age} yrs · ${p.blood}</span></span>
+      ${p.allergies.length?`<span class="dir-al">${icon("alert")}${p.allergies.length}</span>`:""}</button>`}).join("")}</div>`;
+  if(!state.active){ body.innerHTML=dir+`<div style="height:20px"></div>`+emptyState("No patient selected","Choose a demo patient above, or use Patient Search to look up an ID."); return; }
+  const p=PATIENTS[state.active], doc=isDoctor();
+  noteView("records",doc?"patient profile":"patient profile (limited view)",true);
+  const sortedVisits=p.visits.slice().sort((a,b)=>b.date.localeCompare(a.date));
+  const L=p.labs, li=L.dates.length-1;
+  const contact=`<section class="panel"><div class="panel-h"><h3>${icon("phone")}Contact details</h3>${p.demo?`<span class="sub">Fictional numbers</span>`:""}</div>
+    <dl class="contact-dl"><div><dt>Mobile</dt><dd class="mono">${esc(p.phone)}</dd></div><div><dt>City / town</dt><dd>${esc(p.city||"Not recorded")}</dd></div>
+    <div><dt>Emergency contact</dt><dd>${esc(p.emergency.name)} <span style="color:var(--muted);font-weight:500">(${esc(p.emergency.relation)})</span><br><span class="mono">${esc(p.emergency.phone)}</span></dd></div></dl></section>`;
+  const labPanel=L.dates.length?`
+        <p style="font-size:13px;color:var(--muted);margin-bottom:10px">${esc(L.panel)} · ${fmtDate(L.dates[li])} · <strong style="color:var(--warn)">Fictional data</strong></p>
+        <div class="table-wrap"><table><thead><tr><th>Test</th><th class="num">Result</th><th>Reference</th></tr></thead>
+        <tbody>${L.tests.map(t=>{const v=t.values[li],f=outOf(t,v); return `<tr><td>${esc(t.name)}</td><td class="num ${f?"out":""}">${fmtVal(t,v)} <span class="ref">${esc(t.unit)}</span>${f?`<span class="flag">${f}</span>`:""}</td><td class="ref">${esc(t.ref)}</td></tr>`}).join("")}</tbody></table></div>
+        <p class="note">H / L marks a value above or below the reference range.</p>`:`<p style="color:var(--muted)">No laboratory reports recorded yet.</p>`;
+  const clinical=`
+    <div class="grid-2">
+      <section class="panel"><div class="panel-h"><h3>${icon("steth")}Previous medical conditions</h3><span class="count">${p.conditions.length}</span></div>
+        ${p.conditions.length?`<ul class="cond-list">${p.conditions.map(c=>`<li><div><strong>${esc(c.name)}</strong><small>Recorded ${fmtDate(c.date)} · ${esc(c.by)}</small></div><span class="status">${esc(c.status)}</span></li>`).join("")}</ul>`:`<p style="color:var(--muted)">No previous conditions recorded.</p>`}</section>
+      <section class="panel"><div class="panel-h"><h3>${icon("cut")}Previous surgeries</h3><span class="count">${p.surgeries.length}</span></div>
+        ${p.surgeries.length?`<ul class="surg-list">${p.surgeries.map(s=>`<li><div><strong>${esc(s.name)}</strong><small>${esc(s.facility)} · ${esc(s.notes)}</small></div><span class="mono" style="font-size:12.5px;color:var(--muted)">${fmtDate(s.date)}</span></li>`).join("")}</ul>`
+          :`<p style="color:var(--muted)">No surgeries recorded for this patient.</p>`}</section>
+    </div>
+    <section class="panel"><div class="panel-h"><h3>${icon("pill")}Current medication records</h3><span class="count">${p.meds.length}</span></div>
+      ${p.meds.length?`<div class="table-wrap"><table><thead><tr><th>Medication</th><th>Dose</th><th>Frequency</th><th>Since</th><th>Recorded by</th></tr></thead>
+      <tbody>${p.meds.map(m=>`<tr><td><strong>${esc(m.name)}</strong></td><td class="mono">${esc(m.dose)}</td><td>${esc(m.freq)}</td><td class="mono">${m.since}</td><td>${esc(m.by)}</td></tr>`).join("")}</tbody></table></div>`:`<p style="color:var(--muted)">No current medicines recorded.</p>`}
+      <p class="note">Displayed exactly as documented by the prescribing doctor. MediTrack 360 does not suggest, change or recommend medicines.</p></section>
+    <div class="grid-2">
+      <section class="panel"><div class="panel-h"><h3>${icon("history")}Hospital visit history</h3><button class="link" data-go="history">Full timeline ${icon("arrow")}</button></div>
+        ${sortedVisits.length?"":`<p style="color:var(--muted)">No hospital visits recorded yet.</p>`}<ul class="row-list">${sortedVisits.map(v=>`<li><div class="row-btn" style="cursor:default"><span class="row-date">${fmtDate(v.date)}</span><span class="row-main"><strong>${esc(v.dept)}</strong><span>${esc(v.reason)}</span></span><span class="badge k-${v.kind.toLowerCase()}">${v.kind}</span></div></li>`).join("")}</ul></section>
+      <section class="panel"><div class="panel-h"><h3>${icon("flask")}Latest laboratory report</h3><button class="link" data-go="labs">Lab analytics ${icon("arrow")}</button></div>${labPanel}</section>
+    </div>`;
+  body.innerHTML=dir+`<div style="height:20px"></div>`+`
+    <article class="profile">
+      <header class="panel profile-head">
+        <div class="av">${initials(p.name)}</div>
+        <div class="ph-main">
+          <div class="eyebrow">Patient medical profile · ${p.demo?"fictional demo patient":"registered this session"}</div>
+          <h2>${esc(p.name)}</h2>
+          <dl class="facts">
+            <div><dt>Patient ID</dt><dd class="mono">${p.id}</dd></div>
+            <div><dt>Age</dt><dd>${p.age} years</dd></div>
+            <div><dt>Sex</dt><dd>${p.sex}</dd></div>
+            <div><dt>Blood group</dt><dd><span class="blood">${icon("drop")}${p.blood}</span></dd></div>
+            <div><dt>Registered</dt><dd class="mono" style="font-size:14px">${fmtDate(p.registered)}</dd></div>
+            ${doc&&sortedVisits.length?`<div><dt>Last visit</dt><dd class="mono" style="font-size:14px">${fmtDate(sortedVisits[0].date)}</dd></div>`:""}
+          </dl>
+        </div>
+        <div class="ph-actions">
+          <button class="btn" data-qr="${p.id}">${icon("qr")}Generate QR</button>
+          ${doc?`<button class="btn" data-go="emergency">${icon("siren")}Emergency summary</button><button class="btn" data-go="history">${icon("history")}History</button><button class="btn" data-go="labs">${icon("flask")}Lab reports</button>`:""}
+        </div>
+      </header>
+      ${allergyCard(p)}
+      ${contact}
+      ${doc?clinical:restrictedCard()}
+    </article>`;
+  if(opts.flash){ const a=$("#allergyAlert"); if(a){ a.classList.remove("flash"); void a.offsetWidth; a.classList.add("flash"); } }
+}
+
+/* ============ PATIENT CONTEXT + SELECTS ============ */
+function fillSelect(sel){
+  const s=$(sel);
+  s.innerHTML=`<option value="">Select a patient…</option>`+ids().map(id=>`<option value="${id}">${id} · ${esc(PATIENTS[id].name)}</option>`).join("");
+  s.value=state.active||"";
+}
+["#histPatient","#labPatient","#emPatient"].forEach(sel=>$(sel).addEventListener("change",e=>{
+  const v=e.target.value;
+  if(v) openPatient(v,"Patient selector",false); else { state.active=null; renderView(); }
+}));
+function ctxHead(p){
+  return `<div class="panel ctx"><span class="av">${initials(p.name)}</span><div class="ctx-txt"><strong>${esc(p.name)}</strong><span><span class="mono">${p.id}</span> · ${p.age} yrs · ${p.sex} · Blood group ${p.blood}</span></div>
+    <button class="btn" data-go="records">${icon("clip")}Full profile</button></div>${allergyStrip(p)}`;
+}
+
+/* ============ HISTORY ============ */
+function buildEvents(p){
+  const ev=[];
+  p.visits.forEach(v=>ev.push({date:v.date,group:"visit",cls:v.kind==="Emergency"?"t-emergency":v.kind==="Inpatient"?"t-inpatient":"t-visit",ic:v.kind==="Inpatient"?"bed":"steth",
+    type:`Hospital visit · ${v.kind}`,title:v.dept,text:v.reason,meta:`${v.doctor} · ${FAC}`}));
+  p.labs.dates.forEach((d,i)=>ev.push({date:d,group:"lab",cls:"t-lab",ic:"flask",type:"Laboratory investigation",title:p.labs.panel,
+    vals:p.labs.tests.map(t=>{const v=t.values[i],f=outOf(t,v);return {txt:`${t.name} ${fmtVal(t,v)} ${t.unit}${f?" "+f:""}`,out:!!f}}),meta:"Fictional results · "+FAC}));
+  p.surgeries.forEach(s=>ev.push({date:s.date,group:"procedure",cls:"t-procedure",ic:"cut",type:"Surgical procedure",title:s.name,text:s.notes,meta:s.facility}));
+  p.conditions.forEach(c=>ev.push({date:c.date,group:"event",cls:"",ic:"file",type:"Diagnosis recorded",title:c.name,text:`Status: ${c.status}`,meta:c.by}));
+  p.allergies.forEach(a=>ev.push({date:a.date,group:"event",cls:"t-allergy",ic:"alert",type:"Allergy documented",title:a.allergen,text:`${a.reaction} · ${a.severity}`,meta:"Added to allergy alerts"}));
+  p.meds.forEach(m=>ev.push({date:m.date,group:"med",cls:"",ic:"pill",type:"Medicine prescribed",title:m.name,text:[m.dose,m.freq].filter(x=>x&&x!=="—").join(" · ")||"Dose and frequency not recorded",meta:m.by}));
+  if(!p.demo) ev.push({date:p.registered,group:"event",cls:"t-visit",ic:"plus",type:"Patient registered",title:`Patient ID ${p.id} created`,text:`Blood group ${p.blood}`,meta:"MediTrack 360 registration"});
+  return ev.sort((a,b)=>b.date.localeCompare(a.date));
+}
+function renderHistory(){
+  fillSelect("#histPatient");
+  $$("#histFilters [data-filter]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.filter===state.histFilter)));
+  const body=$("#histBody");
+  $("#histFilters").hidden=!isDoctor()||!state.active;
+  if(!isDoctor()){ noteView("history","medical history",false); body.innerHTML=restrictedCard(); return; }
+  if(!state.active){ body.innerHTML=emptyState("Choose a patient","The timeline lists hospital visits, laboratory investigations, procedures and recorded events in date order."); return; }
+  const p=PATIENTS[state.active];
+  noteView("history","medical history",true);
+  const evs=buildEvents(p).filter(e=>state.histFilter==="all"||e.group===state.histFilter);
+  let html=ctxHead(p)+`<div style="height:4px"></div>`;
+  if(!evs.length){ html+=`<div class="panel empty">${icon("history")}<strong>Nothing recorded in this category</strong><p>Choose “All events” to see the full history.</p></div>`; }
+  else{
+    const years=[...new Set(evs.map(e=>e.date.slice(0,4)))];
+    html+=`<div class="panel" style="padding-top:12px">`+years.map(y=>`<div class="tl-year">${y}</div><ol class="tl">${evs.filter(e=>e.date.startsWith(y)).map(e=>`
+      <li class="tl-item ${e.cls}"><div class="tl-dot">${icon(e.ic)}</div><div class="tl-card">
+        <div class="tl-top"><span class="tl-date">${fmtDate(e.date)}</span><span class="tl-type">${esc(e.type)}</span></div>
+        <h4>${esc(e.title)}</h4>${e.text?`<p>${esc(e.text)}</p>`:""}
+        ${e.vals?`<div class="tl-vals">${e.vals.map(v=>`<span class="${v.out?"out":""}">${esc(v.txt)}</span>`).join("")}</div>`:""}
+        <div class="tl-meta">${esc(e.meta)}</div></div></li>`).join("")}</ol>`).join("")+`</div>`;
+  }
+  body.innerHTML=html;
+}
+
+/* ============ LAB REPORTS ============ */
+const refBand={id:"refBand",beforeDatasetsDraw(chart,args,o){
+  if(!o||o.low==null) return;
+  const {ctx,chartArea:a,scales:{y}}=chart;
+  const top=Math.max(a.top,y.getPixelForValue(o.high)), bot=Math.min(a.bottom,y.getPixelForValue(o.low));
+  if(bot<=top) return;
+  ctx.save(); ctx.fillStyle=o.color; ctx.fillRect(a.left,top,a.right-a.left,bot-top);
+  ctx.strokeStyle=o.line; ctx.setLineDash([4,4]); ctx.lineWidth=1;
+  [top,bot].forEach(yy=>{ if(yy>a.top+1&&yy<a.bottom-1){ ctx.beginPath(); ctx.moveTo(a.left,yy); ctx.lineTo(a.right,yy); ctx.stroke(); } });
+  ctx.restore();
+}};
+function renderLabs(){
+  fillSelect("#labPatient");
+  const body=$("#labBody");
+  destroyChart("lab");
+  if(!isDoctor()){ noteView("labs","laboratory reports",false); body.innerHTML=restrictedCard(); return; }
+  if(!state.active){ body.innerHTML=emptyState("Choose a patient","See fictional laboratory results as a trend chart, a results table and a side-by-side comparison of two dates."); return; }
+  const p=PATIENTS[state.active], L=p.labs;
+  noteView("labs","laboratory reports",true);
+  if(!L.dates.length){ body.innerHTML=ctxHead(p)+`<div class="panel empty">${icon("flask")}<strong>No laboratory reports recorded yet</strong><p>Reports appear here after the patient's first investigation is added to the record.</p></div>`; return; }
+  if(!L.tests.some(t=>t.key===state.labTest)) state.labTest=L.tests[0].key;
+  if(state.cmp.pid!==p.id) state.cmp={pid:p.id,a:0,b:L.dates.length-1};
+  body.innerHTML=ctxHead(p)+`
+    <div class="fiction-flag">${icon("flask")}<strong>Fictional laboratory data</strong><span>Created for this demonstration only. These are not real patient results.</span></div>
+    <section class="panel">
+      <div class="panel-h"><h3>${icon("flask")}Result trend</h3><span class="sub">${esc(L.panel)} · ${L.dates.length} reports</span></div>
+      <div class="filters" role="group" aria-label="Choose a test">${L.tests.map(t=>`<button class="chip" data-test="${t.key}" aria-pressed="${t.key===state.labTest}">${esc(t.name)}</button>`).join("")}</div>
+      <div class="trend-head" id="trendHead"></div>
+      <div class="chart-box" style="height:300px"><canvas id="labChart" aria-label="Line chart of the selected test over time"></canvas></div>
+      <div class="legend"><span><i class="lg-band"></i>Reference range</span><span><i class="lg-pt"></i>Within range</span><span><i class="lg-pt out"></i>Outside reference range</span></div>
+    </section>
+    <section class="panel">
+      <div class="panel-h"><h3>${icon("clip")}Results by date</h3><span class="sub">H = above range · L = below range</span></div>
+      <div class="table-wrap"><table><thead><tr><th>Test</th><th>Unit</th><th>Reference</th>${L.dates.map(d=>`<th class="num">${fmtDate(d)}</th>`).join("")}</tr></thead>
+      <tbody>${L.tests.map(t=>`<tr><td><strong>${esc(t.name)}</strong></td><td class="ref">${esc(t.unit)}</td><td class="ref">${esc(t.ref)}</td>${t.values.map(v=>{const f=outOf(t,v);return `<td class="num ${f?"out":""}">${fmtVal(t,v)}${f?`<span class="flag">${f}</span>`:""}</td>`}).join("")}</tr>`).join("")}</tbody></table></div>
+    </section>
+    <section class="panel">
+      <div class="panel-h"><h3>${icon("cal")}Compare two reports</h3><span class="sub">Choose any two report dates</span></div>
+      <div class="cmp-controls">
+        <div class="field"><label for="cmpA">First report</label><select class="input" id="cmpA">${L.dates.map((d,i)=>`<option value="${i}">${fmtDate(d)}</option>`).join("")}</select></div>
+        <div class="field"><label for="cmpB">Second report</label><select class="input" id="cmpB">${L.dates.map((d,i)=>`<option value="${i}">${fmtDate(d)}</option>`).join("")}</select></div>
+      </div>
+      <div id="cmpTable"></div>
+    </section>`;
+  $("#cmpA").value=state.cmp.a; $("#cmpB").value=state.cmp.b;
+  $("#cmpA").addEventListener("change",e=>{state.cmp.a=+e.target.value; renderCompare(p);});
+  $("#cmpB").addEventListener("change",e=>{state.cmp.b=+e.target.value; renderCompare(p);});
+  renderCompare(p);
+  renderTrend(p);
+}
+function renderTrend(p){
+  if(!p) return;
+  const t=p.labs.tests.find(x=>x.key===state.labTest), L=p.labs, li=L.dates.length-1;
+  $$("[data-test]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.test===t.key)));
+  const last=t.values[li], first=t.values[0], f=outOf(t,last);
+  const d=last-first;
+  $("#trendHead").innerHTML=`
+    <div><div class="th-lbl">Latest · ${fmtDate(L.dates[li])}</div><div class="th-big ${f?"out":""}">${fmtVal(t,last)}<small>${esc(t.unit)}</small></div></div>
+    <div><div class="th-lbl">Reference range</div><div class="mono" style="font-size:16px;font-weight:600">${esc(t.ref)} <span class="ref">${esc(t.unit)}</span></div></div>
+    <div><div class="th-lbl">Change since ${fmtDate(L.dates[0])}</div><div class="mono" style="font-size:16px;font-weight:600">${d>0?"+":""}${fmtVal(t,d)} ${esc(t.unit)}</div></div>`;
+  drawLabChart(p,t);
+}
+function drawLabChart(p,t){
+  const cv=$("#labChart"); if(!cv) return;
+  destroyChart("lab");
+  if(typeof Chart==="undefined"){ cv.parentElement.innerHTML='<p class="note">The chart library could not load. The results table below shows the same values.</p>'; return; }
+  const out=t.values.map(v=>!!outOf(t,v));
+  const all=[...t.values,t.low,t.high], mn=Math.min(...all), mx=Math.max(...all), pad=(mx-mn)*0.12||1;
+  const acc=tok("--accent"), dan=tok("--danger");
+  state.charts.lab=new Chart(cv,{type:"line",
+    data:{labels:p.labs.dates.map(fmtShort),datasets:[{label:t.name,data:t.values,borderColor:acc,backgroundColor:acc,borderWidth:2.5,tension:.25,
+      pointBackgroundColor:out.map(o=>o?dan:acc),pointBorderColor:tok("--surface"),pointBorderWidth:2,pointRadius:6,pointHoverRadius:8}]},
+    options:{responsive:true,maintainAspectRatio:false,animation:{duration:reducedMotion()?0:650},interaction:{mode:"nearest",intersect:false},
+      layout:{padding:{top:6,right:8}},
+      scales:{y:{min:Math.max(0,+(mn-pad).toFixed(t.dp)),max:+(mx+pad).toFixed(t.dp),grid:{color:tok("--line")},border:{display:false},
+                 ticks:{color:tok("--muted")},title:{display:true,text:t.unit,color:tok("--muted")}},
+              x:{grid:{display:false},ticks:{color:tok("--muted")}}},
+      plugins:{legend:{display:false},
+        tooltip:{callbacks:{title:c=>fmtDate(p.labs.dates[c[0].dataIndex]),label:c=>`${t.name}: ${fmtVal(t,c.parsed.y)} ${t.unit}${out[c.dataIndex]?" (outside reference range)":""}`}},
+        refBand:{low:t.low,high:t.high,color:tok("--band"),line:acc}}},
+    plugins:[refBand]});
+}
+function renderCompare(p){
+  const L=p.labs, a=state.cmp.a, b=state.cmp.b, el=$("#cmpTable");
+  if(a===b){ el.innerHTML=reMsg("info","Choose two different report dates to compare."); return; }
+  el.innerHTML=`<div class="table-wrap"><table><thead><tr><th>Test</th><th class="num">${fmtDate(L.dates[a])}</th><th class="num">${fmtDate(L.dates[b])}</th><th class="num">Change</th><th>Reference</th></tr></thead><tbody>${
+    L.tests.map(t=>{const va=t.values[a], vb=t.values[b], fa=outOf(t,va), fb=outOf(t,vb), d=+(vb-va).toFixed(t.dp);
+      const cls=d>0?"up":d<0?"down":"same";
+      return `<tr><td><strong>${esc(t.name)}</strong> <span class="ref">${esc(t.unit)}</span></td>
+        <td class="num ${fa?"out":""}">${fmtVal(t,va)}${fa?`<span class="flag">${fa}</span>`:""}</td>
+        <td class="num ${fb?"out":""}">${fmtVal(t,vb)}${fb?`<span class="flag">${fb}</span>`:""}</td>
+        <td class="num"><span class="delta ${cls}">${d>0?"+":""}${fmtVal(t,d)}</span></td><td class="ref">${esc(t.ref)}</td></tr>`}).join("")
+  }</tbody></table></div><p class="note">Change is the second value minus the first. The system shows differences only and does not interpret them.</p>`;
+}
+
+/* ============ REGISTRATION ============ */
+const isoToday=()=>{const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;};
+function nextId(){ return "PT"+(Math.max(1000,...ids().map(i=>+i.slice(2)))+1); }
+function allergyRow(){
+  return `<div class="al-row"><input class="input" placeholder="Allergen, e.g. Penicillin" aria-label="Allergen" maxlength="40" data-al="name"><input class="input" placeholder="Reaction, e.g. Skin rash" aria-label="Reaction" maxlength="60" data-al="reaction"><select class="input" aria-label="Severity" data-al="sev"><option>Severe</option><option selected>Moderate</option><option>Mild</option></select><button class="icon-btn" type="button" data-rm-al aria-label="Remove this allergy">${icon("x")}</button></div>`;
+}
+function syncAlEmpty(){
+  const box=$("#allergyRows"), e=box.querySelector(".al-empty"), has=box.querySelector(".al-row");
+  if(!has&&!e) box.innerHTML=`<p class="al-empty">No allergies added. Leave this empty if the patient reports none.</p>`;
+  if(has&&e) e.remove();
+}
+function renderRegister(){ $("#nextId").textContent=nextId(); syncAlEmpty(); }
+$("#addAllergy").addEventListener("click",()=>{ const box=$("#allergyRows"); const e=box.querySelector(".al-empty"); if(e) e.remove();
+  box.insertAdjacentHTML("beforeend",allergyRow()); box.lastElementChild.querySelector("input").focus(); });
+$("#allergyRows").addEventListener("click",e=>{ const b=e.target.closest("[data-rm-al]"); if(b){ b.closest(".al-row").remove(); syncAlEmpty(); } });
+$("#regForm").addEventListener("reset",()=>setTimeout(()=>{ $("#allergyRows").innerHTML=""; syncAlEmpty(); $$("#regForm .invalid").forEach(x=>x.classList.remove("invalid")); $("#regMsg").innerHTML=""; },0));
+function normPhone(v){ let d=String(v).replace(/\D/g,""); if(d.length===12&&d.startsWith("91")) d=d.slice(2); if(d.length===11&&d.startsWith("0")) d=d.slice(1);
+  return /^[6-9]\d{9}$/.test(d)?`+91 ${d.slice(0,5)} ${d.slice(5)}`:null; }
+const clean=v=>String(v||"").trim().replace(/\s+/g," ");
+$("#regForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  if(state.busy) return;
+  const errs=[]; const bad=(sel,text)=>{ $(sel).classList.add("invalid"); errs.push({sel,text}); };
+  $$("#regForm .invalid").forEach(x=>x.classList.remove("invalid"));
+  const name=clean($("#rName").value), ageS=$("#rAge").value.trim(), age=Number(ageS), sex=$("#rSex").value, blood=$("#rBlood").value;
+  const phone=normPhone($("#rPhone").value), city=clean($("#rCity").value);
+  const eName=clean($("#rEName").value), eRel=clean($("#rERel").value), ePhone=normPhone($("#rEPhone").value);
+  if(name.length<2||!/\p{L}/u.test(name)) bad("#rName","Enter the patient's full name.");
+  if(ageS===""||!Number.isInteger(age)||age<0||age>120) bad("#rAge","Enter an age in whole years between 0 and 120.");
+  if(!sex) bad("#rSex","Select the patient's sex.");
+  if(!blood) bad("#rBlood","Select a blood group, or choose “Not known”.");
+  if(!phone) bad("#rPhone","Enter a valid 10-digit Indian mobile number for the patient.");
+  if(eName.length<2) bad("#rEName","Enter the emergency contact's name.");
+  if(!eRel) bad("#rERel","Enter how the emergency contact is related to the patient.");
+  if(!ePhone) bad("#rEPhone","Enter a valid 10-digit mobile number for the emergency contact.");
+  else if(phone && ePhone===phone) bad("#rEPhone","The emergency contact number must be different from the patient's own number.");
+  const allergies=[];
+  $$("#allergyRows .al-row").forEach(r=>{
+    const a=r.querySelector('[data-al="name"]'), rc=r.querySelector('[data-al="reaction"]');
+    const an=clean(a.value), rn=clean(rc.value);
+    if(!an&&!rn) return;
+    if(!an){ a.classList.add("invalid"); errs.push({el:a,text:"Each allergy needs the allergen's name, or remove the empty row."}); return; }
+    allergies.push({allergen:an, reaction:rn||"Reaction not specified", severity:r.querySelector('[data-al="sev"]').value, date:isoToday()});
+  });
+  if(!errs.length && phone){
+    const dup=ids().find(i=>PATIENTS[i].name.toLowerCase()===name.toLowerCase()&&PATIENTS[i].phone===phone);
+    if(dup) errs.push({sel:"#rName",text:`${name} with this mobile number is already registered as ${dup}. Open that record instead of creating a duplicate.`});
+  }
+  if(errs.length){
+    $("#regMsg").innerHTML=reMsg("error",`<strong>Please correct ${errs.length===1?"this field":"these "+errs.length+" fields"}:</strong><ul style="margin-top:4px;padding-left:18px;list-style:disc">${errs.map(x=>`<li>${esc(x.text)}</li>`).join("")}</ul>`);
+    const first=errs[0].el||$(errs[0].sel); if(first) first.focus();
+    return;
+  }
+  state.busy=true;
+  const btn=$("#regBtn"); btn.disabled=true; btn.innerHTML='<span class="spinner"></span>Registering…'; $("#regMsg").innerHTML="";
+  setTimeout(()=>{
+    state.busy=false; btn.disabled=false; btn.innerHTML=`${icon("check")}Register patient`;
+    if(!state.user) return;
+    const id=nextId(), today=isoToday(), yr=today.slice(0,4);
+    const split=v=>clean(v).split(",").map(clean).filter(Boolean).slice(0,10);
+    PATIENTS[id]={id, demo:false, name, age, sex, blood, registered:today, phone, city,
+      emergency:{name:eName, relation:eRel, phone:ePhone},
+      conditions:split($("#rCond").value).map(c=>({name:c, date:today, status:"Reported at registration", by:"Self-reported"})),
+      surgeries:[], allergies,
+      meds:split($("#rMeds").value).map(m=>({name:m, dose:"—", freq:"—", since:yr, date:today, by:"Reported at registration"})),
+      visits:[], labs:{panel:"", dates:[], tests:[]}};
+    logAccess("Registered new patient",id);
+    $("#regForm").reset();
+    $("#regResult").innerHTML=`<div class="reg-ok" role="status"><div class="ok-txt"><strong>${icon("check")}Patient registered</strong><div class="big-id">${id}</div><p>${esc(name)} · ${age} yrs · ${esc(sex)} · Blood group ${esc(blood)}</p></div>
+      <div class="ph-actions"><button class="btn primary" data-open="${id}" data-src="New registration">${icon("clip")}Open profile</button><button class="btn" data-qr="${id}">${icon("qr")}Generate QR</button>${isDoctor()?`<button class="btn" data-em="${id}">${icon("siren")}Emergency summary</button>`:""}</div></div>`;
+    $("#nextId").textContent=nextId();
+    window.scrollTo({top:0,behavior:"auto"});
+    toast(`Registered ${id}`);
+  },650);
+});
+
+/* ============ EMERGENCY SUMMARY ============ */
+function renderEmergency(){
+  fillSelect("#emPatient");
+  const body=$("#emBody");
+  if(!isDoctor()){ noteView("emergency","emergency summary",false); body.innerHTML=restrictedCard(); return; }
+  if(!state.active){ body.innerHTML=emptyState("Choose a patient","The emergency summary shows blood group, allergies, current medicines and the emergency contact on one screen."); return; }
+  const p=PATIENTS[state.active];
+  noteView("emergency","emergency summary",true);
+  const order={Severe:0,Moderate:1,Mild:2};
+  const al=p.allergies.slice().sort((a,b)=>order[a.severity]-order[b.severity]);
+  body.innerHTML=`
+    <div class="em-head">${icon("siren")}<div><h2>Emergency Health Summary</h2><p>${esc(p.name)} · ${p.age} yrs · ${esc(p.sex)} · ${p.demo?"fictional demo patient":"registered this session"}</p></div><div class="em-id">${p.id}</div></div>
+    <div class="em-grid">
+      <div class="em-tile"><h3>${icon("drop")}Blood group</h3><div class="em-blood" ${p.blood.length>3?'style="font-size:34px"':""}>${esc(p.blood)}</div></div>
+      <div class="em-tile al"><h3>${icon("alert")}Documented allergies · ${al.length}</h3>
+        ${al.length?`<ul class="em-list">${al.map(a=>`<li><strong>${esc(a.allergen)}</strong><span class="sev sev-${a.severity.toLowerCase()}">${a.severity}</span><span style="color:var(--muted)">${esc(a.reaction)}</span></li>`).join("")}</ul>`:`<p>No allergies documented.</p>`}</div>
+      <div class="em-tile"><h3>${icon("phone")}Emergency contact</h3>
+        <div class="em-contact"><span class="nm">${esc(p.emergency.name)}</span><span style="color:var(--muted)">${esc(p.emergency.relation)}</span><span class="ph" id="emPhone">${esc(p.emergency.phone)}</span>
+        <button class="btn" type="button" id="emCopy" style="justify-self:start;margin-top:8px">${icon("copy")}Copy number</button></div></div>
+      <div class="em-tile"><h3>${icon("pill")}Current medicines · ${p.meds.length}</h3>
+        ${p.meds.length?`<ul class="em-list">${p.meds.map(m=>`<li><strong>${esc(m.name)}</strong>${m.dose!=="—"?`<span class="mono" style="font-size:13.5px">${esc(m.dose)}</span>`:""}${m.freq!=="—"?`<span style="color:var(--muted)">${esc(m.freq)}</span>`:""}</li>`).join("")}</ul>`:`<p>No current medicines recorded.</p>`}</div>
+    </div>
+    <div class="em-tile"><h3>${icon("file")}Recorded conditions</h3>
+      ${p.conditions.length?`<div class="filters">${p.conditions.map(c=>`<span class="chip" style="cursor:default">${esc(c.name)}</span>`).join("")}</div>`:`<p>No conditions recorded.</p>`}
+      <p class="note">A summary of documented information only. MediTrack 360 does not diagnose or recommend treatment.${p.demo?" Contact numbers are fictional.":""}</p></div>`;
+  $("#emCopy").addEventListener("click",()=>{
+    const txt=p.emergency.phone;
+    const fallback=()=>{ const r=document.createRange(); r.selectNodeContents($("#emPhone")); const sel=getSelection(); sel.removeAllRanges(); sel.addRange(r); toast("Number selected. Press Ctrl+C or ⌘C to copy."); };
+    try{ navigator.clipboard.writeText(txt).then(()=>toast(`Copied ${txt}`),fallback); }catch(_){ fallback(); }
+  });
+}
+
+/* ============ AUDIT LOG ============ */
+function renderAudit(){
+  const ps=$("#auditPatient"), us=$("#auditUser"), pv=ps.value, uv=us.value;
+  const pids=[...new Set(state.log.filter(l=>l.id).map(l=>l.id))].sort();
+  const users=[...new Map(state.log.filter(l=>l.staffId!=="—").map(l=>[l.staffId,l.user])).entries()];
+  ps.innerHTML=`<option value="">All patients</option>`+pids.map(i=>`<option value="${i}">${i}${PATIENTS[i]?" · "+esc(PATIENTS[i].name):""}</option>`).join("");
+  us.innerHTML=`<option value="">All staff</option>`+users.map(([sid,n])=>`<option value="${esc(sid)}">${esc(n)} (${esc(sid)})</option>`).join("");
+  ps.value=pids.includes(pv)?pv:""; us.value=users.some(u=>u[0]===uv)?uv:"";
+  const rows=state.log.filter(l=>(!ps.value||l.id===ps.value)&&(!us.value||l.staffId===us.value));
+  $("#auditCount").textContent=`${rows.length} of ${state.log.length} entries`;
+  $("#auditTable").innerHTML=rows.length?`<div class="table-wrap"><table class="audit-table"><thead><tr><th>Date</th><th>Time</th><th>Staff member</th><th>Staff ID</th><th>Role</th><th>Action</th><th>Patient ID</th></tr></thead><tbody>${
+    rows.map(l=>`<tr><td class="mono">${l.t.toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"})}</td><td class="mono">${l.t.toLocaleTimeString("en-GB")}</td><td>${esc(l.user)}</td><td class="mono">${esc(l.staffId)}</td><td><span class="role-pill">${esc(l.role)}</span></td><td class="${/denied|failed/i.test(l.action)?"act-deny":""}">${esc(l.action)}</td><td class="mono">${l.id?esc(l.id):"—"}</td></tr>`).join("")
+  }</tbody></table></div>`:`<div class="empty">${icon("shield")}<strong>No entries match these filters</strong></div>`;
+}
+["#auditPatient","#auditUser"].forEach(sel=>$(sel).addEventListener("change",renderAudit));
+
+/* ============ QR CODES ============ */
+let qrCurrent=null;
+function showQr(id){
+  const p=PATIENTS[id]; if(!p) return;
+  const payload=`MT360:${id}`; qrCurrent=payload;
+  $("#qrTitleText").textContent=`QR code · ${id}`;
+  $("#qrPayload").textContent=payload;
+  const box=$("#qrCanvas"); box.innerHTML=""; $("#qrGenMsg").innerHTML="";
+  if(typeof QRCode==="undefined"){ $("#qrGenMsg").innerHTML=reMsg("error","The QR code library could not load. The code text above still works with “Open with a patient QR code”."); }
+  else new QRCode(box,{text:payload,width:360,height:360,colorDark:"#0B2545",colorLight:"#FFFFFF",correctLevel:QRCode.CorrectLevel.M});
+  logAccess("Generated QR code",id);
+  $("#qrDialog").showModal();
+}
+$("#qrCopy").addEventListener("click",()=>{
+  const txt=qrCurrent;
+  const fallback=()=>{ const r=document.createRange(); r.selectNodeContents($("#qrPayload")); const s=getSelection(); s.removeAllRanges(); s.addRange(r); toast("Text selected. Press Ctrl+C or ⌘C to copy."); };
+  try{ navigator.clipboard.writeText(txt).then(()=>toast(`Copied ${txt}`),fallback); }catch(_){ fallback(); }
+});
+$("#qrTry").addEventListener("click",()=>{ $("#qrDialog").close(); handleQrPayload(qrCurrent,null); });
+
+function handleQrPayload(text,msgEl){
+  const show=h=>{ if(msgEl) msgEl.innerHTML=h; else toast(h.replace(/<[^>]+>/g,"")); };
+  const m=String(text||"").trim().match(/^MT360:(PT\d{4})$/i);
+  if(!m){ show(reMsg("error","<strong>This is not a MediTrack 360 patient code.</strong><br>Patient codes look like MT360:PT1001.")); return; }
+  const id=m[1].toUpperCase();
+  if(!PATIENTS[id]){ show(reMsg("error",`<strong>Code read: ${id}.</strong> No demo patient has this ID.`)); return; }
+  if(msgEl) msgEl.innerHTML="";
+  state.pendingQr=id;
+  $("#authText").innerHTML=`QR code for <strong class="mono">${id}</strong> detected. Enter your PIN, ${esc(state.user.name)}, to open this record.`;
+  $("#authPin").value=""; $("#authMsg").innerHTML="";
+  $("#authDialog").showModal(); setTimeout(()=>$("#authPin").focus(),30);
+}
+$("#authForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  const pin=$("#authPin").value.trim();
+  if(!pin){ $("#authMsg").innerHTML=reMsg("error","Enter your PIN to continue."); return; }
+  if(pin!==state.user.pin){
+    state.pinFails++;
+    const left=3-state.pinFails;
+    logAccess("PIN authorization failed",state.pendingQr);
+    if(left<=0){ $("#authDialog").close(); signOut("Session locked after 3 incorrect PIN attempts."); state.pinFails=0; return; }
+    $("#authMsg").innerHTML=reMsg("error",`Incorrect PIN. ${left} attempt${left===1?"":"s"} left before the session locks.`);
+    $("#authPin").value=""; $("#authPin").focus(); return;
+  }
+  state.pinFails=0;
+  const id=state.pendingQr; state.pendingQr=null;
+  $("#authDialog").close();
+  openPatient(id,"QR code + PIN",true);
+  toast(`Access authorized · ${id}`);
+});
+$("#authDialog").addEventListener("close",()=>{ state.pendingQr=null; });
+$("#qrTextForm").addEventListener("submit",e=>{ e.preventDefault(); handleQrPayload($("#qrText").value,$("#qrMsg")); });
+$("#qrFile").addEventListener("change",e=>{
+  const f=e.target.files&&e.target.files[0], msg=$("#qrMsg"); if(!f) return;
+  if(typeof jsQR!=="function"){ msg.innerHTML=reMsg("error","The QR reader could not load. Type the code text instead, for example MT360:PT1001."); e.target.value=""; return; }
+  msg.innerHTML=`<div class="loading"><span class="spinner"></span>Reading QR code…</div>`;
+  const url=URL.createObjectURL(f), img=new Image();
+  img.onload=()=>{
+    const s=Math.min(1,1200/Math.max(img.naturalWidth,img.naturalHeight)), w=Math.max(1,Math.round(img.naturalWidth*s)), h=Math.max(1,Math.round(img.naturalHeight*s));
+    const c=document.createElement("canvas"); c.width=w; c.height=h;
+    const x=c.getContext("2d",{willReadFrequently:true}); x.fillStyle="#FFFFFF"; x.fillRect(0,0,w,h); x.drawImage(img,0,0,w,h);
+    let code=null; try{ code=jsQR(x.getImageData(0,0,w,h).data,w,h,{inversionAttempts:"attemptBoth"}); }catch(_){}
+    URL.revokeObjectURL(url); e.target.value="";
+    if(!code){ msg.innerHTML=reMsg("error","<strong>No QR code found in that image.</strong><br>Use a clear, straight-on image where the whole code is visible."); return; }
+    handleQrPayload(code.data,msg);
+  };
+  img.onerror=()=>{ URL.revokeObjectURL(url); e.target.value=""; msg.innerHTML=reMsg("error","That file could not be opened as an image. Choose a PNG or JPG file."); };
+  img.src=url;
+});
+
+/* ============ THEME CHANGES ============ */
+function rerenderCharts(){
+  if(!state.user) return;
+  if(state.view==="dashboard") drawVisitsChart();
+  if(state.view==="labs" && state.active && isDoctor()) renderTrend(PATIENTS[state.active]);
+}
+try{ matchMedia("(prefers-color-scheme: dark)").addEventListener("change",rerenderCharts); }catch(_){}
+new MutationObserver(rerenderCharts).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+
+if(typeof Chart!=="undefined"){ Chart.defaults.font.family=getComputedStyle(document.body).fontFamily; Chart.defaults.font.size=12; }
+})();
+</script>
+</body>
+</html>
